@@ -92,6 +92,42 @@ def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
         winTracker[i+1:] = targetWinnings
         return winTracker
 
+def simulationRun_withBankRoll(winProb, maxSpin = 1000, targetWinnings = 80, bankRoll = 256):
+    i = episode_winnings = 0
+    winTracker = np.zeros(maxSpin + 1, dtype=np.int)
+
+    while episode_winnings < targetWinnings:
+        won = False
+        bet_amount = 1
+        while not won:
+            i += 1
+            won = get_spin_result(winProb)
+
+            if won:
+                episode_winnings += bet_amount
+            else:
+                episode_winnings -= bet_amount
+                #have to account for the case when Bankroll < bet amount
+                if bankRoll:
+                    bet_amount = min(bet_amount * 2, bankRoll + episode_winnings)
+                else:
+                    bet_amount *= 2
+
+            winTracker[i] = episode_winnings
+
+            #have to account for the case when Bankroll reaches 0
+            if bankRoll + episode_winnings == 0:
+                winTracker[i+1:] = episode_winnings #forward fill with episode winnings (i.e -256)
+                return winTracker
+
+            if i == maxSpin:
+                return winTracker
+
+    # If episode_winnings reaches 80, forward fill the array with goal
+    if i != maxSpin:
+        winTracker[i+1:] = targetWinnings
+        return winTracker
+
 
 def experiment1_figure1(winProb):
     maxSpins = 1000
@@ -174,9 +210,6 @@ def experiment1_figure3(winProb):
     plt.legend(["Standard Deviation"])
     plt.tight_layout()
     plt.savefig("exp1-stddevplot.png")
-
-
-
 
 if __name__ == "__main__":
     test_code()
