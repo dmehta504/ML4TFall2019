@@ -211,7 +211,7 @@ def experiment1_figure3(winProb):
     axis.set_ylabel("Standard Deviation")
     plt.legend(["Standard Deviation"])
     plt.tight_layout()
-    plt.savefig("exp1-stddevplot.png")
+    #plt.savefig("exp1-stddevplot.png")
 
 
 def experiment2_figure4_figure5(winProb):
@@ -256,13 +256,13 @@ def experiment2_figure4_figure5(winProb):
 
     # Creating extra figure to plot variation of standard deviation over 1000 runs
     fig, axis = plt.subplots(figsize=(10, 5))
-    pd.DataFrame(std_dev).plot(title="Standard Deviation over 1000 Simulation Runs", ax=axis)
+    pd.DataFrame(std_dev).plot(title="Standard Deviation over 1000 Simulation Runs with Bankroll", ax=axis)
     axis.set_xlim(0, 300)
     axis.set_xlabel("Spin")
     axis.set_ylabel("Standard Deviation")
     plt.legend(["Standard Deviation"])
     plt.tight_layout()
-    plt.savefig("exp2-stddevplot.png")
+    #plt.savefig("exp2-stddevplot.png")
 
     #Calculating probability of winning $80 within 1000 bets
     true_false_array = np.apply_along_axis(lambda l: np.any(l == 80), 1, figure_4)
