@@ -52,7 +52,11 @@ def test_code():
     # set appropriately to the probability of a win
     win_prob = 18/38.
     np.random.seed(gtid())  # do this only once
-    experiment1(win_prob)
+
+    #Figure1
+    experiment1_figure1(win_prob)
+    #Figure2
+    experiment1_figure2(win_prob)
     # print(get_spin_result(win_prob))  # test the roulette spin
 
 
@@ -60,7 +64,7 @@ def test_code():
 
 def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
     i = episode_winnings = 0
-    winTracker = np.zeros(maxSpin + 1, dtype=int)
+    winTracker = np.zeros(maxSpin + 1, dtype=np.int)
 
     # Implementing the pseudocode as mentioned in Assignment instructions
     # http://quantsoftware.gatech.edu/Fall_2019_Project_1:_Martingale
@@ -68,7 +72,7 @@ def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
         won = False
         bet_amount = 1
         while not won:
-            i += 1;
+            i += 1
             won = get_spin_result(winProb)
 
             if won:
@@ -87,19 +91,50 @@ def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
         winTracker[i+1:] = targetWinnings
         return winTracker
 
-def experiment1(winProb):
+def experiment1_figure1(winProb):
     maxSpins = 1000
-    figure_1 = np.zeros((10, maxSpins + 1), dtype=int)
+    #Create a figure for 10 simulation runs, 10 rows
+    figure_1 = np.zeros((10, maxSpins + 1), dtype=np.int)
     for i in range(10):
         figure_1[i, :] = simulationRun(winProb, maxSpin=maxSpins)
 
-    fig, axis = plt.subplot(figsize=(10, 5))
+    fig, axis = plt.subplots(figsize=(12, 8))
     pd.DataFrame(figure_1.T).plot(title = "Winnings from 10 Simulation Runs", ax=axis)
 
     axis.set_xlim(0,300)
     axis.set_ylim(-256, 100)
     axis.set_xlabel("Spin")
     axis.set_ylabel("Winnings")
+    plt.legend(["Sim1", "Sim2", "Sim3", "Sim4", "Sim5", "Sim6", "Sim7", "Sim8", "Sim9", "Sim10"])
+    plt.tight_layout()
+    plt.savefig("exp1-fig1.png")
+
+def experiment1_figure2(winProb):
+    #Create a figure for 1000 simulation runs, 1000 rows
+    figure_2 = np.zeros((1000, 1001), dtype=np.int)
+    for i in range(1000):
+        figure_2[i, :] = simulationRun(winProb)
+
+    #Calculate mean & Standard deviation of the 1000 runs
+    mean = np.mean(figure_2, axis=0)
+    std_dev = np.std(figure_2, axis=0)
+
+    fig, axis = plt.subplots(figsize=(20, 10))
+    #Create dataframe from the numpy arrays
+    df = pd.DataFrame(np.array([mean, mean + std_dev, mean - std_dev]))
+    df.ix[0].plot(title = "Winnings from 1000 Simulation Runs", ax=axis) #Plot the mean
+    df.ix[1].plot(ax=axis) #Plot the mean + standard deviation
+    df.ix[2].plot(ax=axis) #Plot the mean - standard deviation
+    axis.fill_between(df.columns.values, df.ix[1].values, df.ix[2].values, alpha=0.2)
+
+    axis.set_xlim(0, 300)
+    axis.set_ylim(-256, 100)
+    axis.set_xlabel("Spin")
+    axis.set_ylabel("Winnings")
+    plt.legend(["Mean", "Mean + StdDev", "Mean - StdDev"])
+    plt.tight_layout()
+    plt.savefig("exp1-fig2.png")
+
 
 if __name__ == "__main__":
     test_code()
