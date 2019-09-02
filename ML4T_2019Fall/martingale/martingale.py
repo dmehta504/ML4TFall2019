@@ -88,9 +88,11 @@ def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
         return winTracker
 
 def experiment1(winProb):
-    figure_1 = np.zeros((10, 1001), dtype=int)
-    for i in xrange(10):
-        figure_1[i, :] = simulationRun(winProb, 10)
+    maxSpins = 1000
+    figure_1 = np.zeros((10, maxSpins + 1), dtype=int)
+    for i in range(10):
+        figure_1[i, :] = simulationRun(winProb, maxSpin=maxSpins)
+
     fig, axis = plt.subplot(figsize=(10, 5))
     pd.DataFrame(figure_1.T).plot(title = "Winnings from 10 Simulation Runs", ax=axis)
 
