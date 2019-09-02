@@ -47,8 +47,7 @@ def get_spin_result(win_prob):
 
 def test_code():
     # American Wheel has 18 Reds, 18 Blacks and 2 Greens (0)
-    # Probablity of winining on a red/black bet is 18/38 = 0.47368
-
+    # Probability of winning on a red/black bet is 18/38 = 0.47368
     # set appropriately to the probability of a win
     win_prob = 18/38.
     np.random.seed(gtid())  # do this only once
@@ -264,6 +263,16 @@ def experiment2_figure4_figure5(winProb):
     plt.legend(["Standard Deviation"])
     plt.tight_layout()
     plt.savefig("exp2-stddevplot.png")
+
+    #Calculating probability of winning $80 within 1000 bets
+    true_false_array = np.apply_along_axis(lambda l: np.any(l == 80), 1, figure_4)
+    probability = np.mean(true_false_array)
+    print("Probability of winning $80 within 1000 bets is %f" % probability)
+
+    #Calculating expected value of winnings after 1000 bets
+    expected_value_array = np.apply_along_axis(lambda l: l[-1], 1, figure_4)
+    expected_value = np.mean(expected_value_array)
+    print("Expected value of winnings after 1000 bets is %f" % expected_value)
 
 
 if __name__ == "__main__":
