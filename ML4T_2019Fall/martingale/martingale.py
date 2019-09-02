@@ -26,6 +26,8 @@ GT ID: 902831571 (replace with your GT ID)
 """
 
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def author():
@@ -44,12 +46,58 @@ def get_spin_result(win_prob):
 
 
 def test_code():
-    win_prob = 0.60  # set appropriately to the probability of a win
+    # American Wheel has 18 Reds, 18 Blacks and 2 Greens (0)
+    # Probablity of winining on a red/black bet is 18/38 = 0.47368
+
+    # set appropriately to the probability of a win
+    win_prob = 18/38.
     np.random.seed(gtid())  # do this only once
-    print(get_spin_result(win_prob))  # test the roulette spin
+    experiment1(win_prob)
+    # print(get_spin_result(win_prob))  # test the roulette spin
 
 
 # add your code here to implement the experiments
+
+def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
+    i = episode_winnings = 0
+    winTracker = np.zeros(maxSpin + 1, dtype=int)
+
+    # Implementing the pseudocode as mentioned in Assignment instructions
+    # http://quantsoftware.gatech.edu/Fall_2019_Project_1:_Martingale
+    while episode_winnings < targetWinnings:
+        won = False
+        bet_amount = 1
+        while not won:
+            i += 1;
+            won = get_spin_result(winProb)
+
+            if won:
+                episode_winnings += bet_amount
+            else:
+                episode_winnings -= bet_amount
+                bet_amount *= 2
+
+            winTracker[i] = episode_winnings
+
+            if i == maxSpin:
+                return winTracker
+
+    # If episode_winnings reaches 80, forward fill the array with goal
+    if i != maxSpin:
+        winTracker[i+1:] = targetWinnings
+        return winTracker
+
+def experiment1(winProb):
+    figure_1 = np.zeros((10, 1001), dtype=int)
+    for i in xrange(10):
+        figure_1[i, :] = simulationRun(winProb, 10)
+    fig, axis = plt.subplot(figsize=(10, 5))
+    pd.DataFrame(figure_1.T).plot(title = "Winnings from 10 Simulation Runs", ax=axis)
+
+    axis.set_xlim(0,300)
+    axis.set_ylim(-256, 100)
+    axis.set_xlabel("Spin")
+    axis.set_ylabel("Winnings")
 
 if __name__ == "__main__":
     test_code()
