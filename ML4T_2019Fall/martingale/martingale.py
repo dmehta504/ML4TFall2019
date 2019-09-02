@@ -59,6 +59,8 @@ def test_code():
     experiment1_figure2(win_prob)
     #Figure3
     experiment1_figure3(win_prob)
+    #Figure4 & Figure5
+    experiment2_figure4_figure5(win_prob)
     # print(get_spin_result(win_prob))  # test the roulette spin
 
 
@@ -91,6 +93,7 @@ def simulationRun(winProb, maxSpin = 1000, targetWinnings = 80):
     if i != maxSpin:
         winTracker[i+1:] = targetWinnings
         return winTracker
+
 
 def simulationRun_withBankRoll(winProb, maxSpin = 1000, targetWinnings = 80, bankRoll = 256):
     i = episode_winnings = 0
@@ -210,6 +213,58 @@ def experiment1_figure3(winProb):
     plt.legend(["Standard Deviation"])
     plt.tight_layout()
     plt.savefig("exp1-stddevplot.png")
+
+
+def experiment2_figure4_figure5(winProb):
+    figure_4 = np.zeros((1000, 1001), dtype=np.int)
+    for i in range(1000):
+        figure_4[i, :] = simulationRun_withBankRoll(winProb)
+
+    #Calculate mean, median & Standard deviation of the 1000 simulations
+    mean = np.mean(figure_4, axis=0)
+    std_dev = np.std(figure_4, axis=0)
+    median = np.median(figure_4, axis=0)
+
+    fig, axis = plt.subplots(figsize=(20, 10))
+    # Create dataframe from the numpy arrays
+    df = pd.DataFrame(np.array([mean, mean + std_dev, mean - std_dev]))
+    df.ix[0].plot(title="Winnings from 1000 Simulation Runs with Bankroll", ax=axis)  # Plot the mean
+    df.ix[1].plot(ax=axis)  # Plot the mean + standard deviation
+    df.ix[2].plot(ax=axis)  # Plot the mean - standard deviation
+
+    axis.set_xlim(0, 300)
+    axis.set_ylim(-256, 100)
+    axis.set_xlabel("Spin")
+    axis.set_ylabel("Winnings")
+    plt.legend(["Mean", "Mean + StdDev", "Mean - StdDev"])
+    plt.tight_layout()
+    plt.savefig("exp2-fig4.png")
+
+    fig, axis = plt.subplots(figsize=(20, 10))
+    # Create dataframe from the numpy arrays
+    df = pd.DataFrame(np.array([median, median + std_dev, median - std_dev]))
+    df.ix[0].plot(title="Winnings from 1000 Simulation Runs with Bankroll", ax=axis)  # Plot the mean
+    df.ix[1].plot(ax=axis)  # Plot the median + standard deviation
+    df.ix[2].plot(ax=axis)  # Plot the median - standard deviation
+
+    axis.set_xlim(0, 300)
+    axis.set_ylim(-256, 100)
+    axis.set_xlabel("Spin")
+    axis.set_ylabel("Winnings")
+    plt.legend(["Median", "Median + StdDev", "Median - StdDev"])
+    plt.tight_layout()
+    plt.savefig("exp2-fig5.png")
+
+    # Creating extra figure to plot variation of standard deviation over 1000 runs
+    fig, axis = plt.subplots(figsize=(10, 5))
+    pd.DataFrame(std_dev).plot(title="Standard Deviation over 1000 Simulation Runs", ax=axis)
+    axis.set_xlim(0, 300)
+    axis.set_xlabel("Spin")
+    axis.set_ylabel("Standard Deviation")
+    plt.legend(["Standard Deviation"])
+    plt.tight_layout()
+    plt.savefig("exp2-stddevplot.png")
+
 
 if __name__ == "__main__":
     test_code()
