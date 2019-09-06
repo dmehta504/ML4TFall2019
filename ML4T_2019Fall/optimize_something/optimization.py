@@ -49,13 +49,15 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     xVal = np.asarray([1./len(syms)] * len(syms))
     bounds = tuple((0.0, 1.0) for _ in range(len(syms)))
     constraints = ({'type': 'eq', 'fun': lambda allocs: 1.0 - np.sum(allocs)})
-    solution = spo(minus_f, xVal, prices, bounds=bounds, constraints=constraints)
+    solution = spo.minimize(minimize_sharpe_ratio, xVal, prices, bounds=bounds, constraints=constraints)
     allocs = solution["x"]
 
-    # add code here to compute stats
 
     # Get daily portfolio value  		   	  			  	 		  		  		    	 		 		   		 		  
-    port_val = prices_SPY  # add code here to compute daily portfolio values
+    port_val = compute_daily_portfolio_value(allocs, prices)  # add code here to compute daily portfolio values
+
+    # add code here to compute stats
+    cr, adr, sddr, sr = 1
 
     # Compare daily portfolio value with SPY using a normalized plot  		   	  			  	 		  		  		    	 		 		   		 		  
     if gen_plot:
@@ -74,6 +76,7 @@ def sharpeRatio(portfolioVal):
 
 def compute_mean_std(daily_returns):
     return daily_returns[1:].mean(), daily_returns[1:].std()
+
 
 def compute_daily_returns(dailyPortfolioVal):
     # df_temp = dailyPortfolioVal.copy()
