@@ -57,7 +57,8 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     daily_returns = compute_daily_returns(dailyPortfolioVal=port_val)
     adr = daily_returns.mean()
     sddr = daily_returns.std()
-    cr = (daily_returns.ix[-1, :] / daily_returns.ix[0, :]) - 1
+    cr = compute_cumulative_return(port_val)
+
 
     # Compare daily portfolio value with SPY using a normalized plot
     if gen_plot:
@@ -104,6 +105,11 @@ def optimize_sr(symbols, prices):
 
 def minimize_sharpe_ratio(allocs, prices):
     return -1 * sharpeRatio(allocs, prices)
+
+
+def compute_cumulative_return(dailyPortfolioVal):
+    cum_ret = (dailyPortfolioVal / dailyPortfolioVal.iloc[0]) - 1
+    return cum_ret[-1]
 
 
 def test_code():
