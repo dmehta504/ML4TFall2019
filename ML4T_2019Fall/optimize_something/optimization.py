@@ -47,7 +47,7 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     # note that the values here ARE NOT meant to be correct for a test case
     # add code here to find the allocations
     allocs, sr = optimize_sr(syms, prices)
-    allocs = np.round(allocs, 5)
+    # allocs = np.round(allocs, 5)
 
     # Get daily portfolio value
     port_val = compute_daily_portfolio_value(allocs, prices)  # add code here to compute daily portfolio values
@@ -57,7 +57,7 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     daily_returns = compute_daily_returns(dailyPortfolioVal=port_val)
     adr = daily_returns.mean()
     sddr = daily_returns.std()
-    cr = 1.0
+    cr = (daily_returns.ix[-1, :] / daily_returns.ix[0, :]) - 1
 
     # Compare daily portfolio value with SPY using a normalized plot
     if gen_plot:
