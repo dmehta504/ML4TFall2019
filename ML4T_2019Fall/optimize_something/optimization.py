@@ -63,8 +63,15 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     # Compare daily portfolio value with SPY using a normalized plot
     if gen_plot:
         # add code to plot here
-        df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)
-        pass
+        prices_SPY_normalized = prices_SPY / prices_SPY[0]
+        df_temp = pd.concat([port_val, prices_SPY_normalized], keys=['Portfolio', 'SPY'], axis=1)
+        plt.subplot()
+        df_temp.plot(title="Daily Portfolio Value and SPY")
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.savefig("plot.png")
+        plt.legend(loc='upper left')
+        plt.show()
 
     return allocs, cr, adr, sddr, sr
 
@@ -89,7 +96,7 @@ def compute_daily_returns(dailyPortfolioVal):
 
 def compute_daily_portfolio_value(allocs, prices):
     # From lecture video 01-07.2
-    normed = prices / prices.ix[0, :]
+    normed = prices / prices.iloc[0, :]
     alloced = normed * allocs
     # position_vals = 1000000 * alloced
     return alloced.sum(axis=1)
