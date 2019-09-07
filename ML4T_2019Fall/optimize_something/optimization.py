@@ -46,12 +46,7 @@ def optimize_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
     # find the allocations for the optimal portfolio
     # note that the values here ARE NOT meant to be correct for a test case
     # add code here to find the allocations
-    # guess = np.asarray([1.0/len(syms)] * len(syms))
-    # bounds = tuple((0.0, 1.0) for _ in range(len(syms)))
-    # constraints = ({'type': 'eq', 'fun': lambda inputs: 1.0 - np.sum(inputs)})
-    # solution = spo.minimize(minimize_sharpe_ratio, xVal, prices, bounds=bounds, constraints=constraints)
-    # allocs = solution.x
-    allocs, sr = optimize(syms, prices)
+    allocs, sr = optimize_sr(syms, prices)
     allocs = np.round(allocs, 5)
 
     # Get daily portfolio value
@@ -89,8 +84,6 @@ def compute_daily_returns(dailyPortfolioVal):
     df_temp[1:] = (dailyPortfolioVal[1:] / dailyPortfolioVal[:-1].values) - 1
     df_temp = df_temp[1:]
     return df_temp
-    # daily_returns = (dailyPortfolioVal[1:] / dailyPortfolioVal[:-1]) - 1
-    # return daily_returns
 
 
 def compute_daily_portfolio_value(allocs, prices):
@@ -101,7 +94,7 @@ def compute_daily_portfolio_value(allocs, prices):
     return alloced.sum(axis=1)
 
 
-def optimize(symbols, prices):
+def optimize_sr(symbols, prices):
     allocs_guess = np.asarray([1./len(symbols)] * len(symbols))
     bounds = tuple((0.0, 1.0) for _ in range(len(symbols)))
     constraints = ({'type': 'eq', 'fun': lambda inputs: 1.0 - np.sum(inputs)})
