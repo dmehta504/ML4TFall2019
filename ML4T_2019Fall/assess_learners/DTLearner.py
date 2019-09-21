@@ -24,6 +24,7 @@ class DTLearner(object):
             best_factor, best_index = self.select_splitval(dataX, dataY)
             split_val = np.median(dataX[:, best_index])
             check_split_val = dataX[:, best_index] <= split_val
+
             if np.array_equal(check_split_val, dataX[:, best_index]):
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
@@ -47,7 +48,22 @@ class DTLearner(object):
 
 
     def query(self, points):
-        pass
+        results = []
+        for i in points:
+            results.append(self.get_query(self.model, i))
+
+        return np.asarray(results)
+
+    def get_query(self, model, x_val):
+        root = model[0]
+        if root == "Leaf":
+            return root[1]
+
+        if x_val <= root[1]:
+            return self.get_query(model[model[2]:, :], x_val)
+        else:
+            return self.get_query(model[model[3]:, :], x_val)
+
 
 
 if __name__=="__main__":
