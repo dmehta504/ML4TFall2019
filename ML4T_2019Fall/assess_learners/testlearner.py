@@ -23,32 +23,34 @@ GT honor code violation.
 """  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
-import math  		   	  			  	 		  		  		    	 		 		   		 		  
-import LinRegLearner as lrl  		   	  			  	 		  		  		    	 		 		   		 		  
-import sys  		   	  			  	 		  		  		    	 		 		   		 		  
+import math
+import sys
+from assess_learners import LinRegLearner as lrl
+from assess_learners import DTLearner as dt
   		   	  			  	 		  		  		    	 		 		   		 		  
-if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    if len(sys.argv) != 2:  		   	  			  	 		  		  		    	 		 		   		 		  
-        print("Usage: python testlearner.py <filename>")  		   	  			  	 		  		  		    	 		 		   		 		  
-        sys.exit(1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    inf = open(sys.argv[1])  		   	  			  	 		  		  		    	 		 		   		 		  
-    data = np.array([list(map(float,s.strip().split(','))) for s in inf.readlines()])  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+if __name__=="__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python testlearner.py <filename>")
+        sys.exit(1)
+    inf = open(sys.argv[1])
+    data = np.array([list(map(float, s.strip().split(','))) for s in inf.readlines()])
+
     # compute how much of the data is training and testing  		   	  			  	 		  		  		    	 		 		   		 		  
     train_rows = int(0.6* data.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     test_rows = data.shape[0] - train_rows  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     # separate out training and testing data  		   	  			  	 		  		  		    	 		 		   		 		  
-    trainX = data[:train_rows,0:-1]  		   	  			  	 		  		  		    	 		 		   		 		  
-    trainY = data[:train_rows,-1]  		   	  			  	 		  		  		    	 		 		   		 		  
-    testX = data[train_rows:,0:-1]  		   	  			  	 		  		  		    	 		 		   		 		  
-    testY = data[train_rows:,-1]  		   	  			  	 		  		  		    	 		 		   		 		  
+    trainX = data[:train_rows, 0:-1]
+    trainY = data[:train_rows, -1]
+    testX = data[train_rows:, 0:-1]
+    testY = data[train_rows:, -1]
   		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"{testX.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"{testY.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
     # create a learner and train it  		   	  			  	 		  		  		    	 		 		   		 		  
-    learner = lrl.LinRegLearner(verbose = True) # create a LinRegLearner  		   	  			  	 		  		  		    	 		 		   		 		  
+    # learner = lrl.LinRegLearner(verbose = True) # create a LinRegLearner
+    learner = dt.DTLearner(leaf_size=3, verbose=False)
     learner.addEvidence(trainX, trainY) # train it  		   	  			  	 		  		  		    	 		 		   		 		  
     print(learner.author())  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
