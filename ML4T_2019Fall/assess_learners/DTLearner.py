@@ -29,7 +29,8 @@ class DTLearner(object):
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
             left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
-            right_tree = self.build_tree(dataX[not check_split_val], dataY[not check_split_val])
+            right_tree = self.build_tree(dataX[dataX[:, best_index] > split_val],
+                                         dataY[dataX[:, best_index] > split_val])
             root = np.asarray([[best_index, split_val, 1, left_tree.shape[0] + 1]])
             return np.vstack((root, left_tree, right_tree))
 
