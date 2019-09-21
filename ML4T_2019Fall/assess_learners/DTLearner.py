@@ -21,8 +21,30 @@ class DTLearner(object):
             return np.asarray([["Leaf", dataY[0], np.nan, np.nan]])
 
         else:
-            split_val = self.select_splitval(dataX, dataY)
-            return None
+            best_factor, best_index = self.select_splitval(dataX, dataY)
+            split_val = np.median(dataX[:, best_index])
+            check_split_val = dataX[:, best_index] <= split_val
+            if np.array_equal(check_split_val, dataX[:, best_index]):
+                return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
+
+            left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
+            right_tree = self.build_tree(dataX[not check_split_val], dataY[not check_split_val])
+            root = np.asarray([[best_index, split_val, 1, left_tree.shape[0] + 1]])
+            return np.vstack((root, left_tree, right_tree))
+
+
+
+    def select_splitval(self, factors, results):
+        best_factor = 0
+        best_index = 0
+        for i in range(factors.shape[1]):
+            correlation = np.correlate(factors[:, i], results)
+            if correlation > best_factor:
+                best_factor = correlation
+                best_index = i
+
+        return best_factor, best_index
+
 
     def query(self, points):
         pass
