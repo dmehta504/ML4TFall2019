@@ -20,7 +20,7 @@ class BagLearner(object):
     def addEvidence(self, dataX, dataY):
 
         for l in self.list_learners:
-            index_array = np.arrange(start=0, end=dataX.shape[0], dtype=int)
+            index_array = np.arange(start=0, stop=dataX.shape[0], dtype=int)
             dataX_slice = np.random.choice(index_array, size=dataX.shape[0], replace=True)
             train_x = dataX[dataX_slice, :]
             train_y = dataY[dataX_slice]
