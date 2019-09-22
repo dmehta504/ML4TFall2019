@@ -4,7 +4,7 @@ from assess_learners import LinRegLearner as lrl
 
 class InsaneLearner(object):
     def __init__(self, verbose=False):
-        self.learner = bg.BagLearner(learner=lrl.LinRegLearner, kwargs={}, bags=20)
+        self.learner = bg.BagLearner(learner=lrl.LinRegLearner, kwargs={}, bags=20, verbose=verbose)
 
     def author(self):
         return 'dmehta32'
