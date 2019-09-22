@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class DTLearner(object):
+class RTLearner(object):
 
     def __init__(self, leaf_size=1, verbose=False):
         self.leaf_size = leaf_size
@@ -26,37 +26,21 @@ class DTLearner(object):
             return np.asarray([["Leaf", dataY[0], np.nan, np.nan]])
 
         else:
-            # Find the best factor to split the nodes on
-            best_factor, best_index = self.select_splitval(dataX, dataY)
-            split_val = np.median(dataX[:, best_index])
-            check_split_val = dataX[:, best_index] <= split_val
+            # Choose a random factor to split the nodes on
+            random_factor = np.random.choice(dataX.shape[1])
+            split_val = np.median(dataX[:, random_factor])
+            check_split_val = dataX[:, random_factor] <= split_val
 
             # Extra termination check - case when split_val splits all the values to only one side i.e. Left Tree
-            if np.array_equal(check_split_val, dataX[:, best_index]):
+            if np.array_equal(check_split_val, dataX[:, random_factor]):
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
             # Recursively build the left & right trees
             left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
-            right_tree = self.build_tree(dataX[dataX[:, best_index] > split_val],
-                                         dataY[dataX[:, best_index] > split_val])
-            root = np.asarray([[best_index, split_val, 1, left_tree.shape[0] + 1]], dtype=float)
+            right_tree = self.build_tree(dataX[dataX[:, random_factor] > split_val],
+                                         dataY[dataX[:, random_factor] > split_val])
+            root = np.asarray([[random_factor, split_val, 1, left_tree.shape[0] + 1]], dtype=float)
             return np.vstack((root, left_tree, right_tree))
-
-    def select_splitval(self, factors, results):
-        """
-        @summary: Select the best feature used to split the values in decision tree
-        @param factors: Factors used in selection of best factor
-        @param results: the Y values or results
-        """
-        best_factor = 0
-        best_index = 0
-        for i in range(factors.shape[1]):
-            correlation = np.corrcoef(factors[:, i], results)[0, 1]
-            if abs(correlation) > best_factor:
-                best_factor = abs(correlation)
-                best_index = i
-
-        return best_factor, best_index
 
     def query(self, points):
         results = []
