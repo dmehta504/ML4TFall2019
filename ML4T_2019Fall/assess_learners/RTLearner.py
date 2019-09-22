@@ -29,14 +29,16 @@ class RTLearner(object):
             # Choose a random factor to split the nodes on
             random_factor = np.random.choice(dataX.shape[1])
             split_val = np.median(dataX[:, random_factor])
-            check_split_val = dataX[:, random_factor] <= split_val
+            max_feature = max(dataX[:, random_factor])
 
-            # Extra termination check - case when split_val splits all the values to only one side i.e. Left Tree
-            if np.array_equal(check_split_val, dataX[:, random_factor]):
+            # Extra termination check - to avoid infinite recursion
+            # Credits : Piazza post - #385
+            if max_feature == split_val:
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
             # Recursively build the left & right trees
-            left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
+            left_tree = self.build_tree(dataX[dataX[:, random_factor] <= split_val],
+                                        dataY[dataX[:, random_factor] <= split_val])
             right_tree = self.build_tree(dataX[dataX[:, random_factor] > split_val],
                                          dataY[dataX[:, random_factor] > split_val])
             root = np.asarray([[random_factor, split_val, 1, left_tree.shape[0] + 1]], dtype=float)

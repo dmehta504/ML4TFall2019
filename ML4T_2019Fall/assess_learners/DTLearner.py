@@ -22,21 +22,23 @@ class DTLearner(object):
             return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
         # If all values in dataY are the same, then all values of X will result in the same Y value
-        elif np.unique(dataY).shape[0] == 1:
+        if np.unique(dataY).shape[0] == 1:
             return np.asarray([["Leaf", dataY[0], np.nan, np.nan]])
 
         else:
             # Find the best factor to split the nodes on
             best_factor, best_index = self.select_splitval(dataX, dataY)
             split_val = np.median(dataX[:, best_index])
-            check_split_val = dataX[:, best_index] <= split_val
+            max_feature = max(dataX[:, best_index])
 
-            # Extra termination check - case when split_val splits all the values to only one side i.e. Left Tree
-            if np.array_equal(check_split_val, dataX[:, best_index]):
+            # Extra termination check - to avoid infinite recursion
+            # Credits : Piazza post - #385
+            if max_feature == split_val:
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
             # Recursively build the left & right trees
-            left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
+            left_tree = self.build_tree(dataX[dataX[:, best_index] <= split_val],
+                                        dataY[dataX[:, best_index] <= split_val])
             right_tree = self.build_tree(dataX[dataX[:, best_index] > split_val],
                                          dataY[dataX[:, best_index] > split_val])
             root = np.asarray([[best_index, split_val, 1, left_tree.shape[0] + 1]], dtype=float)
