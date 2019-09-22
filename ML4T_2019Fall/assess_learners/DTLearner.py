@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class DTLearner(object):
 
     def __init__(self, leaf_size=1, verbose=False):
@@ -42,6 +43,11 @@ class DTLearner(object):
             return np.vstack((root, left_tree, right_tree))
 
     def select_splitval(self, factors, results):
+        """
+        @summary: Select the best feature used to split the values in decision tree
+        @param factors: Factors used in selection of best factor
+        @param results: the Y values or results
+        """
         best_factor = 0
         best_index = 0
         for i in range(factors.shape[1]):
@@ -61,14 +67,25 @@ class DTLearner(object):
         return np.asarray(results)
 
     def get_y_val(self, x_val):
+        """
+        @summary: Returns the Y value/result based on the decision tree model learned
+        @param x_val: The specific query used to find the Y value/result
+        """
         i = 0
+
+        # Iterate through the decision tree until we reach the desired leaf
         while self.model[i][0] != "Leaf":
             split_val = self.model[i][1]
-            if x_val[int(float(self.model[i][0]))] <= float(split_val):
-                i = i + int(float(self.model[i][2]))
-            else:
-                i = i + int(float(self.model[i][3]))
 
+            # If value of query is less than the split_val, go in the left tree
+            if x_val[int(float(self.model[i][0]))] <= float(split_val):
+                # Convert to float then int to avoid runtime errors
+                i = i + int(float(self.model[i][2]))
+            # Else go in the right tree
+            else:
+                i = i + int(float(self.model[i][3]))  # This gets the next node we have to search in the right tree
+
+        # If leaf reached, then return the Y-value from our model
         return self.model[i][1]
 
 
