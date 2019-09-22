@@ -21,39 +21,56 @@ GT honor code violation.
   		   	  			  	 		  		  		    	 		 		   		 		  
 -----do not edit anything above this line---  		   	  			  	 		  		  		    	 		 		   		 		  
 """  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
 import math
 import sys
 from assess_learners import LinRegLearner as lrl
 from assess_learners import DTLearner as dt
-  		   	  			  	 		  		  		    	 		 		   		 		  
-if __name__=="__main__":
+from assess_learners import RTLearner as rt
+from assess_learners import BagLearner as bg
+
+
+def gtid():
+    return 902831571  # replace with your GT ID number
+
+
+if __name__ == "__main__":
+
+    # Credits - Piazza Post # 578
     if len(sys.argv) != 2:
         print("Usage: python testlearner.py <filename>")
         sys.exit(1)
     inf = open(sys.argv[1])
-    data = np.array([list(map(float, s.strip().split(','))) for s in inf.readlines()])
+    if sys.argv[1] == "Data/Istanbul.csv":
+        data = np.genfromtxt(inf, delimiter=",")
+        data = data[1:, 1:]
+    else:
+        data = np.array([list(map(float, s.strip().split(','))) for s in inf.readlines()])
+
+    np.random.seed(gtid())  # do this only once
 
     # compute how much of the data is training and testing  		   	  			  	 		  		  		    	 		 		   		 		  
     train_rows = int(0.6* data.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     test_rows = data.shape[0] - train_rows  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
     # separate out training and testing data  		   	  			  	 		  		  		    	 		 		   		 		  
     trainX = data[:train_rows, 0:-1]
     trainY = data[:train_rows, -1]
     testX = data[train_rows:, 0:-1]
     testY = data[train_rows:, -1]
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
     print(f"{testX.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"{testY.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
 
     # create a learner and train it  		   	  			  	 		  		  		    	 		 		   		 		  
     # learner = lrl.LinRegLearner(verbose = True) # create a LinRegLearner
-    learner = dt.DTLearner(leaf_size=3, verbose=False)
-    learner.addEvidence(trainX, trainY) # train it  		   	  			  	 		  		  		    	 		 		   		 		  
+    # learner = dt.DTLearner(leaf_size=1, verbose=False)
+    # learner = rt.RTLearner(leaf_size=1, verbose=False)
+    learner = bg.BagLearner(learner=dt.DTLearner, kwargs={"leaf_size":1}, bags=20)
+    learner.addEvidence(trainX, trainY)  # train it
     print(learner.author())  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
     # evaluate in sample  		   	  			  	 		  		  		    	 		 		   		 		  
     predY = learner.query(trainX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -62,7 +79,7 @@ if __name__=="__main__":
     print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
     c = np.corrcoef(predY, y=trainY)  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"corr: {c[0,1]}")  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
     # evaluate out of sample  		   	  			  	 		  		  		    	 		 		   		 		  
     predY = learner.query(testX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
