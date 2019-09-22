@@ -14,20 +14,27 @@ class DTLearner(object):
         self.model = self.build_tree(dataX, dataY)
 
     def build_tree(self, dataX, dataY):
+        # Check for termination criteria
+
+        # We have only one sample left (when size = 1), or our sample size is less than the leaf size
         if dataX.shape[0] <= self.leaf_size:
             return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
+        # If all values in dataY are the same, then all values of X will result in the same Y value
         elif np.unique(dataY).shape[0] == 1:
             return np.asarray([["Leaf", dataY[0], np.nan, np.nan]])
 
         else:
+            # Find the best factor to split the nodes on
             best_factor, best_index = self.select_splitval(dataX, dataY)
             split_val = np.median(dataX[:, best_index])
             check_split_val = dataX[:, best_index] <= split_val
 
+            # Extra termination check - case when split_val splits all the values to only one side i.e. Left Tree
             if np.array_equal(check_split_val, dataX[:, best_index]):
                 return np.asarray([["Leaf", np.mean(dataY), np.nan, np.nan]])
 
+            # Recursively build the left & right trees
             left_tree = self.build_tree(dataX[check_split_val], dataY[check_split_val])
             right_tree = self.build_tree(dataX[dataX[:, best_index] > split_val],
                                          dataY[dataX[:, best_index] > split_val])
@@ -48,14 +55,14 @@ class DTLearner(object):
     def query(self, points):
         results = []
         for i in range(points.shape[0]):
-            result = self.get_query(points[i, :])
-            results.append(result)
+            result = self.get_y_val(points[i, :])
+            results.append(float(result))
 
         return np.asarray(results)
 
-    def get_query(self, x_val):
+    def get_y_val(self, x_val):
         i = 0
-        while self.model[i][0] != "Leaf" :
+        while self.model[i][0] != "Leaf":
             split_val = self.model[i][1]
             if x_val[int(float(self.model[i][0]))] <= float(split_val):
                 i = i + int(float(self.model[i][2]))
