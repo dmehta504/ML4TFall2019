@@ -33,6 +33,7 @@ import LinRegLearner as lrl
 import DTLearner as dt
 import RTLearner as rt
 import BagLearner as bg
+import time
 
 
 def gtid():
@@ -178,18 +179,18 @@ def experiment2_figure2():
 
 def experiment3_figure1():
     inf = open("Data/Istanbul.csv")
-    data_exp2 = np.genfromtxt(inf, delimiter=",")
-    data_exp2 = data_exp2[1:, 1:]
+    data_exp3 = np.genfromtxt(inf, delimiter=",")
+    data_exp3 = data_exp3[1:, 1:]
 
     # compute how much of the data is training and testing
-    train_rows_exp3 = int(0.6 * data_exp2.shape[0])
-    test_rows_exp3 = data_exp2.shape[0] - train_rows_exp3
+    train_rows_exp3 = int(0.6 * data_exp3.shape[0])
+    test_rows_exp3 = data_exp3.shape[0] - train_rows_exp3
 
     # separate out training and testing data
-    trainX_exp3 = data_exp2[:train_rows_exp3, 0:-1]
-    trainY_exp3 = data_exp2[:train_rows_exp3, -1]
-    testX_exp3 = data_exp2[train_rows_exp3:, 0:-1]
-    testY_exp3 = data_exp2[train_rows_exp3:, -1]
+    trainX_exp3 = data_exp3[:train_rows_exp3, 0:-1]
+    trainY_exp3 = data_exp3[:train_rows_exp3, -1]
+    testX_exp3 = data_exp3[train_rows_exp3:, 0:-1]
+    testY_exp3 = data_exp3[train_rows_exp3:, -1]
     trainY_exp3_mean = np.mean(trainY_exp3)
     testY_exp3_mean = np.mean(testY_exp3)
 
@@ -253,6 +254,51 @@ def experiment3_figure1():
     plt.tight_layout()
     plt.savefig("exp3-fig1.png")
 
+
+def experiment3_figure2():
+    inf = open("Data/Istanbul.csv")
+    data_exp3 = np.genfromtxt(inf, delimiter=",")
+    data_exp3 = data_exp3[1:, 1:]
+
+    # create list of time values
+    time_taken_dt = []
+    time_taken_rt = []
+    size_index = np.arange(1, data_exp3.shape[0], 20)  # Create an index of how much data to split
+
+    # Iterate through various leaf sizes and record the rmse values
+    for size in size_index:
+        learner_exp3_dt = dt.DTLearner(leaf_size=1)
+        learner_exp3_rt = rt.RTLearner(leaf_size=1)
+        trainX_exp3 = data_exp3[:size, 0:-1]
+        trainY_exp3 = data_exp3[:size, -1]
+
+        # Calculate time taken to learn - DTLearner
+        start_time = time.time()
+        learner_exp3_dt.addEvidence(trainX_exp3, trainY_exp3)
+        end_time = time.time()
+        time_taken = end_time - start_time
+        time_taken_dt.append(time_taken)
+
+        # Calculate time taken to learn - RTLearner
+        start_time = time.time()
+        learner_exp3_rt.addEvidence(trainX_exp3, trainY_exp3)
+        end_time = time.time()
+        time_taken = end_time - start_time
+        time_taken_rt.append(time_taken)
+
+
+    # Generate the plots
+    fig, axis = plt.subplots(figsize=(12, 8))
+    df = pd.DataFrame({"Time-Taken DTLearner": time_taken_dt, "Time-Taken RTLearner": time_taken_rt}, index=size_index)
+    df.plot(ax=axis, title="Comparison of time taken to train between DTLearner and RTLearner")
+    axis.set_xlabel("Size of Training Set")
+    axis.set_ylabel("Time-Taken(secs)")
+    plt.yticks(np.arange(0.00, 0.40, 0.02))
+    plt.xticks(np.arange(0, data_exp3.shape[0], 50))
+    plt.legend(["Time-Taken DTLearner", "Time-Taken RTLearner"], loc='upper left')
+    plt.tight_layout()
+    plt.savefig("exp3-fig2.png")
+
 if __name__ == "__main__":
 
     np.random.seed(gtid())  # do this only once
@@ -260,6 +306,7 @@ if __name__ == "__main__":
     experiment2_figure1()
     experiment2_figure2()
     experiment3_figure1()
+    experiment3_figure2()
     # Credits - Piazza Post # 578
     if len(sys.argv) != 2:
         print("Usage: python testlearner.py <filename>")
@@ -286,9 +333,9 @@ if __name__ == "__main__":
 
     # create a learner and train it  		   	  			  	 		  		  		    	 		 		   		 		  
     # learner = lrl.LinRegLearner(verbose = True) # create a LinRegLearner
-    # learner = dt.DTLearner(leaf_size=1, verbose=False)
+    learner = dt.DTLearner(leaf_size=1, verbose=False)
     # learner = rt.RTLearner(leaf_size=1, verbose=False)
-    learner = bg.BagLearner(learner=dt.DTLearner, kwargs={"leaf_size":1}, bags=1)
+    # learner = bg.BagLearner(learner=dt.DTLearner, kwargs={"leaf_size":1}, bags=1)
     learner.addEvidence(trainX, trainY)  # train it
     print(learner.author())  		   	  			  	 		  		  		    	 		 		   		 		  
 
