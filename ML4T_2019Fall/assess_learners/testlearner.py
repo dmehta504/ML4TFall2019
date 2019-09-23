@@ -25,10 +25,10 @@ GT honor code violation.
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
 import math
 import sys
-from assess_learners import LinRegLearner as lrl
-from assess_learners import DTLearner as dt
-from assess_learners import RTLearner as rt
-from assess_learners import BagLearner as bg
+import LinRegLearner as lrl
+import DTLearner as dt
+import RTLearner as rt
+import BagLearner as bg
 
 
 def gtid():

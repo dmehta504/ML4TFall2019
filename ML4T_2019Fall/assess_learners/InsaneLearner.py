@@ -1,5 +1,5 @@
-from assess_learners import BagLearner as bg
-from assess_learners import LinRegLearner as lrl
+import BagLearner as bg
+import LinRegLearner as lrl
 
 
 class InsaneLearner(object):
