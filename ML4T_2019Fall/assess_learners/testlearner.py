@@ -176,12 +176,90 @@ def experiment2_figure2():
     plt.savefig("exp2-fig2.png")
 
 
+def experiment3_figure1():
+    inf = open("Data/Istanbul.csv")
+    data_exp2 = np.genfromtxt(inf, delimiter=",")
+    data_exp2 = data_exp2[1:, 1:]
+
+    # compute how much of the data is training and testing
+    train_rows_exp3 = int(0.6 * data_exp2.shape[0])
+    test_rows_exp3 = data_exp2.shape[0] - train_rows_exp3
+
+    # separate out training and testing data
+    trainX_exp3 = data_exp2[:train_rows_exp3, 0:-1]
+    trainY_exp3 = data_exp2[:train_rows_exp3, -1]
+    testX_exp3 = data_exp2[train_rows_exp3:, 0:-1]
+    testY_exp3 = data_exp2[train_rows_exp3:, -1]
+    trainY_exp3_mean = np.mean(trainY_exp3)
+    testY_exp3_mean = np.mean(testY_exp3)
+
+    # create list of r2 scores - 1 - (ss_res/ss_tot)
+    # Formula for R2 Score - Credits : https://en.wikipedia.org/wiki/Coefficient_of_determination
+    in_sample_r2score_dt = []
+    out_sample_r2score_dt = []
+    in_sample_r2score_rt = []
+    out_sample_r2score_rt = []
+    leaf_index = np.arange(1, 21)
+
+    # Iterate through various bag sizes and record the rmse values
+    for leaf_size in leaf_index:
+        learner_exp3_dt = dt.DTLearner(leaf_size=leaf_size)
+        learner_exp3_rt = rt.RTLearner(leaf_size=leaf_size)
+        learner_exp3_dt.addEvidence(trainX_exp3, trainY_exp3)
+        learner_exp3_rt.addEvidence(trainX_exp3, trainY_exp3)
+
+        # In - Sample Calculations - DTLearner
+        predY_exp3_dt = learner_exp3_dt.query(trainX_exp3)  # get the predictions
+        ss_res_dt = ((trainY_exp3 - predY_exp3_dt) ** 2).sum()
+        ss_tot_dt = ((trainY_exp3 - trainY_exp3_mean) ** 2).sum()
+        r2score_dt = 1 - (ss_res_dt/ss_tot_dt)
+        in_sample_r2score_dt.append(r2score_dt)
+
+        # In - Sample Calculation - RTLearner
+        predY_exp3_rt = learner_exp3_rt.query(trainX_exp3)  # get the predictions
+        ss_res_rt = ((trainY_exp3 - predY_exp3_rt) ** 2).sum()
+        ss_tot_rt = ((trainY_exp3 - trainY_exp3_mean) ** 2).sum()
+        r2score_rt = 1 - (ss_res_rt / ss_tot_rt)
+        in_sample_r2score_rt.append(r2score_rt)
+
+        # Out - Sample Calculations - DTLearner
+        predY_exp3_dt = learner_exp3_dt.query(testX_exp3)  # get the predictions
+        ss_res_dt = ((testY_exp3 - predY_exp3_dt) ** 2).sum()
+        ss_tot_dt = ((testY_exp3 - testY_exp3_mean) ** 2).sum()
+        r2score_dt = 1 - (ss_res_dt / ss_tot_dt)
+        out_sample_r2score_dt.append(r2score_dt)
+
+        # Out - Sample Calculations - RTLearner
+        predY_exp3_rt = learner_exp3_rt.query(testX_exp3)  # get the predictions
+        ss_res_rt = ((testY_exp3 - predY_exp3_rt) ** 2).sum()
+        ss_tot_rt = ((testY_exp3 - testY_exp3_mean) ** 2).sum()
+        r2score_rt = 1 - (ss_res_rt / ss_tot_rt)
+        out_sample_r2score_rt.append(r2score_rt)
+
+    # Generate the plots
+    fig, axis = plt.subplots(figsize=(12, 8))
+    df = pd.DataFrame({"In-Sample R2Score - DTLearner": in_sample_r2score_dt,
+                       "Out-Sample R2Score - DTLearner": out_sample_r2score_dt,
+                       "In-Sample R2Score - RTLearner": in_sample_r2score_rt,
+                       "Out-Sample R2Score - RTLearner": out_sample_r2score_rt}, index=leaf_index)
+
+    df.plot(ax=axis, title="R-Square(R2 Score) vs LeafSize Comparison for RTLearner & DTLearner")
+    axis.set_xlabel("Leaf Size")
+    axis.set_ylabel("R2 Score")
+    plt.xticks(np.arange(1, 21, 1))
+    plt.yticks(np.arange(0.000, 1.100, 0.1))
+    plt.legend(["In-Sample R2Score - DTLearner", "Out-Sample R2Score - DTLearner",
+                "In-Sample R2Score - RTLearner", "Out-Sample R2Score - RTLearner"], loc='upper right')
+    plt.tight_layout()
+    plt.savefig("exp3-fig1.png")
+
 if __name__ == "__main__":
 
     np.random.seed(gtid())  # do this only once
     experiment1_figure1()
     experiment2_figure1()
     experiment2_figure2()
+    experiment3_figure1()
     # Credits - Piazza Post # 578
     if len(sys.argv) != 2:
         print("Usage: python testlearner.py <filename>")
