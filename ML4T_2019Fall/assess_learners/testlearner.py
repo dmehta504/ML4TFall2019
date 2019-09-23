@@ -299,14 +299,11 @@ def experiment3_figure2():
     plt.tight_layout()
     plt.savefig("exp3-fig2.png")
 
+
 if __name__ == "__main__":
 
     np.random.seed(gtid())  # do this only once
-    experiment1_figure1()
-    experiment2_figure1()
-    experiment2_figure2()
-    experiment3_figure1()
-    experiment3_figure2()
+
     # Credits - Piazza Post # 578
     if len(sys.argv) != 2:
         print("Usage: python testlearner.py <filename>")
@@ -328,32 +325,39 @@ if __name__ == "__main__":
     testX = data[train_rows:, 0:-1]
     testY = data[train_rows:, -1]
 
-    print(f"{testX.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"{testY.shape}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    # print(f"{testX.shape}")
+    # print(f"{testY.shape}")
 
     # create a learner and train it  		   	  			  	 		  		  		    	 		 		   		 		  
     # learner = lrl.LinRegLearner(verbose = True) # create a LinRegLearner
-    learner = dt.DTLearner(leaf_size=1, verbose=False)
+    # learner = dt.DTLearner(leaf_size=1, verbose=False)
     # learner = rt.RTLearner(leaf_size=1, verbose=False)
-    # learner = bg.BagLearner(learner=dt.DTLearner, kwargs={"leaf_size":1}, bags=1)
+    learner = bg.BagLearner(learner=dt.DTLearner, kwargs={"leaf_size":1}, bags=1)
     learner.addEvidence(trainX, trainY)  # train it
-    print(learner.author())  		   	  			  	 		  		  		    	 		 		   		 		  
+    # print(learner.author())
 
     # evaluate in sample  		   	  			  	 		  		  		    	 		 		   		 		  
     predY = learner.query(trainX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("In sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    # print()
+    # print("In sample results")
+    # print(f"RMSE: {rmse}")
     c = np.corrcoef(predY, y=trainY)  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"corr: {c[0,1]}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    # print(f"corr: {c[0,1]}")
 
     # evaluate out of sample  		   	  			  	 		  		  		    	 		 		   		 		  
     predY = learner.query(testX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("Out of sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    # print()
+    # print("Out of sample results")
+    # print(f"RMSE: {rmse}")
     c = np.corrcoef(predY, y=testY)  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"corr: {c[0,1]}")
+    # print(f"corr: {c[0,1]}")
+
+    # Code for generating plots used in report
+    experiment1_figure1()
+    experiment2_figure1()
+    experiment2_figure2()
+    experiment3_figure1()
+    experiment3_figure2()
 
