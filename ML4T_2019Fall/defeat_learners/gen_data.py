@@ -33,11 +33,15 @@ import math
 # better for linear regression than decision trees  		   	  			  	 		  		  		    	 		 		   		 		  
 def best4LinReg(seed=1489683273):
     np.random.seed(seed)
-    X = np.zeros((100, 2))
-    Y = np.random.random(size=(100,)) * 200 - 100
+    num_rows = np.random.randint(10, 1000, dtype=int)
+    num_cols = np.random.randint(2, 10, dtype=int)
+    X = np.random.random((num_rows, num_cols))
+    Y = np.zeros(num_rows)
+    for i in range(0, num_rows):
+        Y[i] = X[i, :].sum()
     # Here's is an example of creating a Y from randomly generated  		   	  			  	 		  		  		    	 		 		   		 		  
     # X with multiple columns  		   	  			  	 		  		  		    	 		 		   		 		  
-    # Y = X[:,0] + np.sin(X[:,1]) + X[:,2]**2 + X[:,3]**3  		   	  			  	 		  		  		    	 		 		   		 		  
+    # Y = X[:,0] + np.sin(X[:,1]) + X[:,2]**2 + X[:,3]**3
     return X, Y
 
 
