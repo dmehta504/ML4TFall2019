@@ -61,7 +61,7 @@ def test_code():
     # create two learners and get data  		   	  			  	 		  		  		    	 		 		   		 		  
     lrlearner = lrl.LinRegLearner(verbose = False)  		   	  			  	 		  		  		    	 		 		   		 		  
     dtlearner = dt.DTLearner(verbose = False, leaf_size = 1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    X, Y = best4LinReg()  		   	  			  	 		  		  		    	 		 		   		 		  
+    X, Y = best4LinReg()
   		   	  			  	 		  		  		    	 		 		   		 		  
     # compare the two learners  		   	  			  	 		  		  		    	 		 		   		 		  
     rmseLR, rmseDT = compare_os_rmse(lrlearner, dtlearner, X, Y)  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -77,7 +77,7 @@ def test_code():
         print("LR >= 0.9 DT:  fail")  		   	  			  	 		  		  		    	 		 		   		 		  
     print  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-    # get data that is best for a random tree  		   	  			  	 		  		  		    	 		 		   		 		  
+    # get data that is best for a decision tree
     lrlearner = lrl.LinRegLearner(verbose = False)  		   	  			  	 		  		  		    	 		 		   		 		  
     dtlearner = dt.DTLearner(verbose = False, leaf_size = 1)  		   	  			  	 		  		  		    	 		 		   		 		  
     X, Y = best4DT()  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -87,7 +87,7 @@ def test_code():
   		   	  			  	 		  		  		    	 		 		   		 		  
     # share results  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("best4RT() results")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("best4DT() results")
     print(f"RMSE LR    : {rmseLR}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"RMSE DT    : {rmseDT}")  		   	  			  	 		  		  		    	 		 		   		 		  
     if rmseDT < 0.9 * rmseLR:  		   	  			  	 		  		  		    	 		 		   		 		  
