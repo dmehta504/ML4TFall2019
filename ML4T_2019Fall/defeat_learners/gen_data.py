@@ -21,8 +21,8 @@ GT honor code violation.
 -----do not edit anything above this line---  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 Student Name: Tucker Balch (replace with your name)  		   	  			  	 		  		  		    	 		 		   		 		  
-GT User ID: tb34 (replace with your User ID)  		   	  			  	 		  		  		    	 		 		   		 		  
-GT ID: 900897987 (replace with your GT ID)  		   	  			  	 		  		  		    	 		 		   		 		  
+GT User ID: dmehta32 (replace with your User ID)
+GT ID: 902831571 (replace with your GT ID)
 """
 
 import numpy as np
@@ -47,8 +47,18 @@ def best4LinReg(seed=1489683273):
 
 def best4DT(seed=1489683273):
     np.random.seed(seed)
-    X = np.zeros((100, 2))
-    Y = np.random.random(size=(100,)) * 200 - 100
+    num_rows = np.random.randint(10, 1000, dtype=int)  # choose number of rows between 10-1000
+    num_cols = np.random.randint(2, 10, dtype=int)  # choose number of columns between 2-10
+    X = np.random.random((num_rows, num_cols))
+    Y = np.zeros(num_rows)
+
+    for i in range(0, num_rows - 1):
+        # This fills all
+        if i % 3 == 0:
+            Y = Y + np.sin(X[i, :].sum()) + np.random.randint(0, 1000)
+        else:
+            Y = Y - np.tan(X[i, :].sum()) + np.random.randint(0, 1000)
+
     return X, Y
 
 
