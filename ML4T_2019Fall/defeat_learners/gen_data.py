@@ -53,9 +53,9 @@ def best4DT(seed=1489683273):
     Y = np.zeros(num_rows)
 
     for i in range(0, num_rows - 1):
-        # This fills all
+        # Generate Decision Tree based on a choice made
         if i % 3 == 0:
-            Y = Y + np.sin(X[i, :].sum()) + np.random.randint(0, 1000)
+            Y = Y + np.sin(X[i, :].sum()) + np.random.randint(0, 100)
         else:
             Y = Y - np.tan(X[i, :].sum()) + np.random.randint(0, 1000)
 
