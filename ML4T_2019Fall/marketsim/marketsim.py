@@ -90,24 +90,25 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
                 if buy_or_sell == "BUY":
                     price_of_stock = (1 + impact) * price_of_stock
                     total_portfolio_val = total_portfolio_val - (price_of_stock * number_of_shares) - commission
-                    portvals.loc[date, stock] -= number_of_shares
+                    portvals.loc[date, stock] += number_of_shares
                 else:
                     price_of_stock = (1 - impact) * price_of_stock
                     total_portfolio_val = total_portfolio_val + (price_of_stock * number_of_shares) - commission
                     portvals.loc[date, stock] -= number_of_shares
 
         for symbol in symbols:
-            portvals.loc[date, "portfolio_value"] += portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol]
+            portvals.loc[date, "portfolio_value"] += (portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol])
 
         # Update portfolio value for current day and initialize next day's portfolio value to 0
         portvals.loc[date, "portfolio_value"] += total_portfolio_val
         previous_day = date
 
-
-    portvals = portvals.sort_index(ascending=True)
     portvals = portvals.iloc[:, 0].to_frame()
-    # return rv
     return portvals
+
+
+def author():
+    return 'dmehta32'
 
 
 def test_code():
