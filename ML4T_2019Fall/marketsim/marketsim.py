@@ -33,9 +33,9 @@ from util import get_data, plot_data
 
 
 def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commission=9.95, impact=0.005):
-    # this is the function the autograder will call to test your code  		   	  			  	 		  		  		    	 		 		   		 		  
-    # NOTE: orders_file may be a string, or it may be a file object. Your  		   	  			  	 		  		  		    	 		 		   		 		  
-    # code should work correctly with either input  		   	  			  	 		  		  		    	 		 		   		 		  
+    # this is the function the autograder will call to test your code
+    # NOTE: orders_file may be a string, or it may be a file object. Your
+    # code should work correctly with either input
     # TODO: Your code here
 
     # Get the orders from file
@@ -43,8 +43,8 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     start_date = orders.index.min()
     end_date = orders.index.max()
 
-    # In the template, instead of computing the value of the portfolio, we just  		   	  			  	 		  		  		    	 		 		   		 		  
-    # read in the value of IBM over 6 months  		   	  			  	 		  		  		    	 		 		   		 		  
+    # In the template, instead of computing the value of the portfolio, we just
+    # read in the value of IBM over 6 months
     # start_date = dt.datetime(2008, 1, 1)
     # end_date = dt.datetime(2008, 6, 1)
     portvals_SPY = get_data(['SPY'], pd.date_range(start_date, end_date))
@@ -54,10 +54,10 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     # Remove the dates SPY didn't trade on
     for date in dates_index:
         if date not in portvals_SPY.index:
-            dates_index.drop(date)
+            dates_index = dates_index.drop(date)
 
     # Get the prices of the stocks that were traded in the orders file, forward fill then back-fill for missing values
-    symbols = orders["Symbol"].unique().toList()
+    symbols = orders["Symbol"].unique().tolist()
     symbol_dict = {}
     for symbol in symbols:
         symbol_dict[symbol] = get_data([symbol], pd.date_range(start_date, end_date), colname='Adj Close')
@@ -68,13 +68,20 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
 
     # Initialize portofolio val at start to 0, as no money has been made
     total_portfolio_val = start_val
-    portvals.loc[start_date, :] = 0
+    previous_day = None
 
     # Execute the orders and simulate the portfolio
     for date in dates_index:
+        # Copy previous trading day's portfolio state
+        if previous_day is not None:
+            portvals.loc[date, :] = portvals.loc[previous_day, :]
+            portvals.loc[date, "portfolio_value"] = 0
+        else:
+            portvals.loc[date, :] = 0
+
         if date in orders.index:
             orders_made = orders.loc[[date]]
-            for _, order in orders_made:
+            for _, order in orders_made.iterrows():
                 stock = order["Symbol"]
                 buy_or_sell = order["Order"]
                 number_of_shares = order["Shares"]
@@ -92,10 +99,13 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
         for symbol in symbols:
             portvals.loc[date, "portfolio_value"] += portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol]
 
+        # Update portfolio value for current day and initialize next day's portfolio value to 0
         portvals.loc[date, "portfolio_value"] += total_portfolio_val
+        previous_day = date
 
 
     portvals = portvals.sort_index(ascending=True)
+    portvals = portvals.iloc[:, 0].to_frame()
     # return rv
     return portvals
 
@@ -105,7 +115,7 @@ def test_code():
     # note that during autograding his function will not be called.  		   	  			  	 		  		  		    	 		 		   		 		  
     # Define input parameters  		   	  			  	 		  		  		    	 		 		   		 		  
 
-    of = "./orders/orders2.csv"
+    of = "./orders/orders-01.csv"
     sv = 1000000
 
     # Process orders  		   	  			  	 		  		  		    	 		 		   		 		  
