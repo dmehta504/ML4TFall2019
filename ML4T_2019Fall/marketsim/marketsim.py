@@ -118,6 +118,26 @@ def author():
     return 'dmehta32'
 
 
+def compute_portfolio_stats(portvals):
+    # Calculate cumulative return
+    cumulative_return = (portvals / portvals[0]) - 1
+    cumulative_return = cumulative_return[-1]
+
+    # Calculate daily returns
+    daily_return = portvals.copy()
+    daily_return[1:] = (portvals[1:] / portvals[:-1].values) - 1
+    avg_daily_ret = daily_return[1:].mean()
+
+    # Calculate standard deviation of daily returns
+    std_daily_ret = daily_return[1:].std()
+
+    # Calculate Sharpe Ratio
+    k = np.sqrt(252)
+    sharpe_ratio = k * (avg_daily_ret/std_daily_ret)
+
+    return cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio
+
+
 def test_code():
     # this is a helper function you can use to test your code  		   	  			  	 		  		  		    	 		 		   		 		  
     # note that during autograding his function will not be called.  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -138,7 +158,7 @@ def test_code():
     # Here we just fake the data. you should use your code from previous assignments.  		   	  			  	 		  		  		    	 		 		   		 		  
     start_date = portvals.index[0]
     end_date = portvals.index[-1]
-    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = [0.2, 0.01, 0.02, 1.5]
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_portfolio_stats(portvals)
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2, 0.01, 0.02, 1.5]
 
     # Compare portfolio against $SPX  		   	  			  	 		  		  		    	 		 		   		 		  
