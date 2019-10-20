@@ -36,16 +36,66 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     # this is the function the autograder will call to test your code  		   	  			  	 		  		  		    	 		 		   		 		  
     # NOTE: orders_file may be a string, or it may be a file object. Your  		   	  			  	 		  		  		    	 		 		   		 		  
     # code should work correctly with either input  		   	  			  	 		  		  		    	 		 		   		 		  
-    # TODO: Your code here  		   	  			  	 		  		  		    	 		 		   		 		  
+    # TODO: Your code here
+
+    # Get the orders from file
+    orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
+    start_date = orders.index.min()
+    end_date = orders.index.max()
 
     # In the template, instead of computing the value of the portfolio, we just  		   	  			  	 		  		  		    	 		 		   		 		  
     # read in the value of IBM over 6 months  		   	  			  	 		  		  		    	 		 		   		 		  
-    start_date = dt.datetime(2008, 1, 1)
-    end_date = dt.datetime(2008, 6, 1)
-    portvals = get_data(['IBM'], pd.date_range(start_date, end_date))
-    portvals = portvals[['IBM']]  # remove SPY  		   	  			  	 		  		  		    	 		 		   		 		  
-    rv = pd.DataFrame(index=portvals.index, data=portvals.values)
+    # start_date = dt.datetime(2008, 1, 1)
+    # end_date = dt.datetime(2008, 6, 1)
+    portvals_SPY = get_data(['SPY'], pd.date_range(start_date, end_date))
+    portvals_SPY = portvals_SPY[['SPY']]  # remove SPY
+    dates_index = pd.date_range(start_date, end_date, freq='D')
 
+    # Remove the dates SPY didn't trade on
+    for date in dates_index:
+        if date not in portvals_SPY.index:
+            dates_index.drop(date)
+
+    # Get the prices of the stocks that were traded in the orders file, forward fill then back-fill for missing values
+    symbols = orders["Symbol"].unique().toList()
+    symbol_dict = {}
+    for symbol in symbols:
+        symbol_dict[symbol] = get_data([symbol], pd.date_range(start_date, end_date), colname='Adj Close')
+        symbol_dict[symbol] = symbol_dict[symbol].resample("D").fillna(method='ffill')
+        symbol_dict[symbol] = symbol_dict[symbol].fillna(method='bfill')
+
+    portvals = pd.DataFrame(index=dates_index, columns=["portfolio_value"] + symbols)
+
+    # Initialize portofolio val at start to 0, as no money has been made
+    total_portfolio_val = start_val
+    portvals.loc[start_date, :] = 0
+
+    # Execute the orders and simulate the portfolio
+    for date in dates_index:
+        if date in orders.index:
+            orders_made = orders.loc[[date]]
+            for _, order in orders_made:
+                stock = order["Symbol"]
+                buy_or_sell = order["Order"]
+                number_of_shares = order["Shares"]
+                price_of_stock = symbol_dict[stock].loc[date, stock]
+
+                if buy_or_sell == "BUY":
+                    price_of_stock = (1 + impact) * price_of_stock
+                    total_portfolio_val = total_portfolio_val - (price_of_stock * number_of_shares) - commission
+                    portvals.loc[date, stock] -= number_of_shares
+                else:
+                    price_of_stock = (1 - impact) * price_of_stock
+                    total_portfolio_val = total_portfolio_val + (price_of_stock * number_of_shares) - commission
+                    portvals.loc[date, stock] -= number_of_shares
+
+        for symbol in symbols:
+            portvals.loc[date, "portfolio_value"] += portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol]
+
+        portvals.loc[date, "portfolio_value"] += total_portfolio_val
+
+
+    portvals = portvals.sort_index(ascending=True)
     # return rv
     return portvals
 
