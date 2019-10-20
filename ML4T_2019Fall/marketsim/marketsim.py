@@ -36,7 +36,6 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     # this is the function the autograder will call to test your code
     # NOTE: orders_file may be a string, or it may be a file object. Your
     # code should work correctly with either input
-    # TODO: Your code here
 
     # Get the orders from file
     orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
@@ -64,46 +63,54 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
         symbol_dict[symbol] = symbol_dict[symbol].resample("D").fillna(method='ffill')
         symbol_dict[symbol] = symbol_dict[symbol].fillna(method='bfill')
 
-    portvals = pd.DataFrame(index=dates_index, columns=["portfolio_value"] + symbols)
+    # Create a portfolio to track total portfolio value and number of shares of each stock
+    portvals = pd.DataFrame(index=dates_index, columns=["total"] + symbols)
 
-    # Initialize portofolio val at start to 0, as no money has been made
+    # Initialize portfolio val at start to starting value, as no money has been made
     total_portfolio_val = start_val
-    previous_day = None
+    date_last = None
 
     # Execute the orders and simulate the portfolio
     for date in dates_index:
-        # Copy previous trading day's portfolio state
-        if previous_day is not None:
-            portvals.loc[date, :] = portvals.loc[previous_day, :]
-            portvals.loc[date, "portfolio_value"] = 0
-        else:
-            portvals.loc[date, :] = 0
 
+        if date_last is None:
+            # This is when no trades have been made i.e. first day of trading
+            portvals.loc[date, :] = 0
+        else:
+            # Make a copy of the values of the previous trading day
+            portvals.loc[date, :] = portvals.loc[date_last, :]
+            portvals.loc[date, "total"] = 0
+
+        # If orders are made on that particular date, calculate new values for stocks & portfolio
         if date in orders.index:
             orders_made = orders.loc[[date]]
-            for _, order in orders_made.iterrows():
+            for temp, order in orders_made.iterrows():
                 stock = order["Symbol"]
-                buy_or_sell = order["Order"]
                 number_of_shares = order["Shares"]
+                buy_or_sell = order["Order"]
                 price_of_stock = symbol_dict[stock].loc[date, stock]
 
                 if buy_or_sell == "BUY":
                     price_of_stock = (1 + impact) * price_of_stock
+                    # If shares are bought, subtract cash amount and commission
                     total_portfolio_val = total_portfolio_val - (price_of_stock * number_of_shares) - commission
-                    portvals.loc[date, stock] += number_of_shares
-                else:
+                    portvals.loc[date, stock] += number_of_shares  # Update the number of shares held of that stock
+                elif buy_or_sell == "SELL":
                     price_of_stock = (1 - impact) * price_of_stock
+                    # If shares are sold, add cash amount and subtract commission
                     total_portfolio_val = total_portfolio_val + (price_of_stock * number_of_shares) - commission
                     portvals.loc[date, stock] -= number_of_shares
 
+        # Update portfolio value for current date
         for symbol in symbols:
-            portvals.loc[date, "portfolio_value"] += (portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol])
+            # Multiply the number of shares * price of stock for that trading day and add it to the portfolio value
+            portvals.loc[date, "total"] += (portvals.loc[date, symbol] * symbol_dict[symbol].loc[date, symbol])
 
-        # Update portfolio value for current day and initialize next day's portfolio value to 0
-        portvals.loc[date, "portfolio_value"] += total_portfolio_val
-        previous_day = date
+        portvals.loc[date, "total"] += total_portfolio_val
+        date_last = date
 
-    portvals = portvals.iloc[:, 0].to_frame()
+    # return the first column containing portfolio values
+    portvals = portvals.loc[:, "total"].to_frame()
     return portvals
 
 
@@ -127,10 +134,10 @@ def test_code():
     else:
         "warning, code did not return a DataFrame"
 
-        # Get portfolio stats
+    # Get portfolio stats
     # Here we just fake the data. you should use your code from previous assignments.  		   	  			  	 		  		  		    	 		 		   		 		  
-    start_date = dt.datetime(2008, 1, 1)
-    end_date = dt.datetime(2008, 6, 1)
+    start_date = portvals.index[0]
+    end_date = portvals.index[-1]
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = [0.2, 0.01, 0.02, 1.5]
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2, 0.01, 0.02, 1.5]
 
