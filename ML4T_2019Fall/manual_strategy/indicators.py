@@ -1,4 +1,10 @@
-from util import get_data
+""" Fall 2019 - Project 6 : Manual Strategy
+Student Name: Dhruv Mehta (replace with your name)
+GT User ID: dmehta32 (replace with your User ID)
+GT ID: 902831571 (replace with your GT ID)
+"""
+
+import util
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -24,10 +30,18 @@ def compute_portfolio_stats(portvals):
     return cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio
 
 
-def get_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 1, 1),
-                       syms=['GOOG', 'AAPL', 'GLD', 'XOM']):
+def get_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), syms=['JPM']):
+    # Code from optimization.py
+    # Project 2 - Optimize Something
     dates = pd.date_range(sd, ed)
-    prices_all = get_data(syms, dates)  # automatically adds SPY
+    prices_all = util.get_data(syms, dates)  # automatically adds SPY
     prices = prices_all[syms]  # only portfolio symbols
 
     return prices
+
+
+def calculate_sma(portvals):
+    sma = portvals.rolling(window=10).mean()
+    return sma
+
+
