@@ -8,6 +8,7 @@ import util
 import numpy as np
 import pandas as pd
 import datetime as dt
+import matplotlib.pyplot as plt
 
 
 def compute_portfolio_stats(portvals):
@@ -60,9 +61,28 @@ def calculate_momentum(prices, window):
 
 
 def test_code():
-    prices_JPM = get_portfolio()
+    sd = dt.datetime(2008, 1, 1)
+    ed = dt.datetime(2009, 12, 31)
+    symbol = ['JPM']
+    prices_JPM = get_portfolio(sd, ed, symbol)
     prices = prices_JPM / prices_JPM.iloc[0, :]  # Normalize the prices
-    
+
+    # Calculate the indicators
+    sma = calculate_sma(prices)
+    upper_band, lower_band, bb_ratio = calculate_bb(prices)
+    momentum = calculate_momentum(prices, window=10)
+
+    # Create Dataframe to help plot the various values
+    df = pd.concat([prices, sma, upper_band, lower_band, bb_ratio, momentum], axis=1)
+    df.columns = ["Prices", "SMA", "Upper Band", "Lower Band", "Bollinger Ratio", "Momentum"]
+
+    # Create the various plots
+    # Plot 1 - SMA
+    df[["Prices", "SMA"]].plot(figsize=(10, 8))
+    plt.show()
+
+
+
 
 
 
