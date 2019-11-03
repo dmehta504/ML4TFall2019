@@ -3,11 +3,11 @@ Student Name: Dhruv Mehta (replace with your name)
 GT User ID: dmehta32 (replace with your User ID)
 GT ID: 902831571 (replace with your GT ID)
 """
+
 import util
 import numpy as np
 import pandas as pd
 import datetime as dt
-import matplotlib.pyplot as plt
 
 
 def compute_portfolio_stats(portvals):
@@ -30,13 +30,13 @@ def compute_portfolio_stats(portvals):
     return cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio
 
 
-def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commission=9.95, impact=0.005):
+def compute_portvals(df_trades, start_val=1000000, commission=9.95, impact=0.005):
     # this is the function the autograder will call to test your code
     # NOTE: orders_file may be a string, or it may be a file object. Your
     # code should work correctly with either input
 
     # Get the orders from file
-    orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
+    orders = df_trades
     start_date = orders.index.min()
     end_date = orders.index.max()
 
@@ -44,7 +44,7 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     # read in the value of IBM over 6 months
     # start_date = dt.datetime(2008, 1, 1)
     # end_date = dt.datetime(2008, 6, 1)
-    portvals_SPY = get_data(['SPY'], pd.date_range(start_date, end_date))
+    portvals_SPY = util.get_data(['SPY'], pd.date_range(start_date, end_date))
     portvals_SPY = portvals_SPY[['SPY']]  # remove SPY
     dates_index = pd.date_range(start_date, end_date, freq='D')
 
@@ -54,10 +54,10 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
             dates_index = dates_index.drop(date)
 
     # Get the prices of the stocks that were traded in the orders file, forward fill then back-fill for missing values
-    symbols = orders["Symbol"].unique().tolist()
+    symbols = df_trades.columns.unique().tolist()
     symbol_dict = {}
     for symbol in symbols:
-        symbol_dict[symbol] = get_data([symbol], pd.date_range(start_date, end_date), colname='Adj Close')
+        symbol_dict[symbol] = util.get_data([symbol], pd.date_range(start_date, end_date), colname='Adj Close')
         symbol_dict[symbol] = symbol_dict[symbol].resample("D").fillna(method='ffill')
         symbol_dict[symbol] = symbol_dict[symbol].fillna(method='bfill')
 
@@ -110,3 +110,20 @@ def compute_portvals(orders_file="./orders/orders.csv", start_val=1000000, commi
     # return the first column containing portfolio values
     portvals = portvals.loc[:, "total"].to_frame()
     return portvals
+
+
+def author():
+    return 'dmehta32'
+
+
+def test_code():
+    sd = dt.datetime(2009, 12, 29)
+    ed = dt.datetime(2009, 12, 31)
+    symbol = ['JPM']
+    df_trades = pd.DataFrame([1000, 0, -1000], columns=["JPM"], index=pd.date_range(sd, ed))
+    portvals = compute_portvals(df_trades)
+    print(portvals)
+
+
+if __name__ == "__main__":
+    test_code()
