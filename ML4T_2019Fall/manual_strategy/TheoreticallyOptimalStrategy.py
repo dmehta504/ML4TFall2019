@@ -8,6 +8,7 @@ import util
 import numpy as np
 import pandas as pd
 import datetime as dt
+import marketsimcode as ms
 
 
 def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), sv=100000):
@@ -60,3 +61,14 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
 def compute_daily_returns(prices):
     daily_returns = prices / prices.shift(1) - 1
     return daily_returns
+
+
+def test_code():
+    df_trades = testPolicy()
+    portvals = ms.compute_portvals(df_trades, start_val=1000000, commission=0, impact=0)
+    cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
+    print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
+
+
+if __name__ == "__main__":
+    test_code()
