@@ -40,8 +40,16 @@ def get_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), syms
     return prices
 
 
-def calculate_sma(portvals):
-    sma = portvals.rolling(window=10).mean()
+def calculate_sma(prices):
+    sma = prices.rolling(window=10).mean()
     return sma
 
+
+def calculate_bb(prices):
+    std = prices.rolling(window=10).std()
+    sma = calculate_sma(prices)
+    upper_band = sma + (2 * std)
+    lower_band = sma - (2 * std)
+    bb_ratio = (prices - sma) / (2 * std)
+    return upper_band, lower_band, bb_ratio
 
