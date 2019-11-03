@@ -74,11 +74,19 @@ def test_code():
 
     # Create Dataframe to help plot the various values
     df = pd.concat([prices, sma, upper_band, lower_band, bb_ratio, momentum], axis=1)
-    df.columns = ["Prices", "SMA", "Upper Band", "Lower Band", "Bollinger Ratio", "Momentum"]
+    df.columns = ["JPM", "SMA", "Upper Band", "Lower Band", "Bollinger Ratio", "Momentum"]
 
     # Create the various plots
     # Plot 1 - SMA
-    df[["Prices", "SMA"]].plot(figsize=(10, 8))
+    df[["JPM", "SMA"]].plot(figsize=(10, 8))
+    plt.show()
+
+    # Plot 2 - Bollinger Bands
+    df[["JPM", "SMA", "Upper Band", "Lower Band", "Bollinger Ratio"]].plot(figsize=(20, 10))
+    plt.show()
+
+    # Plot 3 - Momentum
+    df[["JPM", "Momentum"]].plot(figsize=(10, 8))
     plt.show()
 
 
