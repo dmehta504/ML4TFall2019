@@ -82,6 +82,13 @@ def test_code():
     plt.show()
 
 
+def author():
+    return 'dmehta32'
+
+
+if __name__ == "__main__":
+    test_code()
+
 
 
 
