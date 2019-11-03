@@ -53,3 +53,16 @@ def calculate_bb(prices):
     bb_ratio = (prices - sma) / (2 * std)
     return upper_band, lower_band, bb_ratio
 
+
+def calculate_momentum(prices, window):
+    momentum = prices.diff(window)/prices.shift(window)
+    return momentum
+
+
+def test_code():
+    prices_JPM = get_portfolio()
+    prices = prices_JPM / prices_JPM.iloc[0, :]  # Normalize the prices
+    
+
+
+
