@@ -82,18 +82,16 @@ def compute_portvals(df_trades, start_val=1000000, commission=9.95, impact=0.005
         # If orders are made on that particular date, calculate new values for stocks & portfolio
         if date in orders.index:
             orders_made = orders.loc[[date]]
-            for temp, order in orders_made.iterrows():
-                stock = order["Symbol"]
-                number_of_shares = order["Shares"]
-                buy_or_sell = order["Order"]
+            for stock in orders_made.columns:
+                number_of_shares = abs(orders_made.iloc[0][stock])
                 price_of_stock = symbol_dict[stock].loc[date, stock]
 
-                if buy_or_sell == "BUY":
+                if orders_made.iloc[0][stock] > 0:
                     price_of_stock = (1 + impact) * price_of_stock
                     # If shares are bought, subtract cash amount and commission
                     total_portfolio_val = total_portfolio_val - (price_of_stock * number_of_shares) - commission
                     portvals.loc[date, stock] += number_of_shares  # Update the number of shares held of that stock
-                elif buy_or_sell == "SELL":
+                elif orders_made.iloc[0][stock] < 0:
                     price_of_stock = (1 - impact) * price_of_stock
                     # If shares are sold, add cash amount and subtract commission
                     total_portfolio_val = total_portfolio_val + (price_of_stock * number_of_shares) - commission
