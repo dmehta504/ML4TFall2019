@@ -32,26 +32,26 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
 
         if daily_returns.loc[date] < 0:
             if current_holding == 0:
-                df_trades.loc[date] = -1000
+                df_trades.loc[date_last] = -1000
                 current_holding -= 1000
             elif current_holding == 1000:
-                df_trades.loc[date] = -2000
+                df_trades.loc[date_last] = -2000
                 current_holding -= 2000
             elif current_holding == -1000:
-                df_trades.loc[date] = 0
+                df_trades.loc[date_last] = 0
 
         elif daily_returns.loc[date] > 0:
             if current_holding == 0:
-                df_trades.loc[date] = 1000
+                df_trades.loc[date_last] = 1000
                 current_holding += 1000
             elif current_holding == -1000:
-                df_trades.loc[date] = 2000
+                df_trades.loc[date_last] = 2000
                 current_holding += 2000
             elif current_holding == 1000:
-                df_trades.loc[date] = 0
+                df_trades.loc[date_last] = 0
 
         else:
-            df_trades.loc[date] = 0
+            df_trades.loc[date_last] = 0
 
         date_last = date
 
