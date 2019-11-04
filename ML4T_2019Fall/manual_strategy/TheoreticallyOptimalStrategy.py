@@ -75,9 +75,30 @@ def test_code():
             portvals.columns[0]]  # just get the first column
     else:
         "warning, code did not return a DataFrame"
+    # Calculate stats of Portfolio
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
 
-    cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
-    print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
+    # Benchmark Portfolio
+    df_benchmark = pd.DataFrame(index=df_trades.index, columns=["JPM"])
+    df_benchmark.loc[df_trades.index] = 0
+    df_benchmark.loc[df_trades.index[0]] = 1000  # Buying 1000 shares of JPM
+    portvals_benchmark = ms.compute_portvals(df_benchmark, start_val=100000, commission=0, impact=0)
+
+    # Compare portfolio against benchmark
+    start_date = portvals.index[0]
+    end_date = portvals.index[-1]
+
+    print(f"Date Range: {start_date} to {end_date}")
+    print()
+    print(f"Sharpe Ratio of Fund: {sharpe_ratio}")
+    print()
+    print(f"Cumulative Return of Fund: {cum_ret}")
+    print()
+    print(f"Standard Deviation of Fund: {std_daily_ret}")
+    print()
+    print(f"Average Daily Return of Fund: {avg_daily_ret}")
+    print()
+    print(f"Final Portfolio Value: {portvals[-1]}")
 
 
 if __name__ == "__main__":
