@@ -29,11 +29,6 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             date_last = date
             continue
 
-        # Last day of trading, no more future prices to look at
-        if date == prices_SPY.index[-1]:
-            df_trades.loc[date] = 0
-            break
-
         present_price = prices_JPM.loc[date_last]
         future_price = prices_JPM.loc[date]
 
@@ -62,6 +57,9 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
 
         date_last = date
 
+    # For the last day of trading, we have no more future prices to look at
+    # Hence, we don't place any orders and assign the value 0
+    df_trades.loc[prices_JPM.index[-1]] = 0
     return df_trades
 
 
