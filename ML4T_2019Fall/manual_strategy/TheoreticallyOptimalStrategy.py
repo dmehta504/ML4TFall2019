@@ -33,6 +33,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
         present_price = prices_JPM.loc[date_last]
         future_price = prices_JPM.loc[date]
 
+        # Sell the stock i.e. SHORT
         if future_price < present_price:
             if current_holding == 0:
                 df_trades.loc[date_last] = -1000
@@ -43,6 +44,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             elif current_holding == -1000:
                 df_trades.loc[date_last] = 0
 
+        # Buy the stock i.e. LONG
         elif future_price > present_price:
             if current_holding == 0:
                 df_trades.loc[date_last] = 1000
@@ -84,6 +86,9 @@ def test_code():
     df_benchmark.loc[df_trades.index] = 0
     df_benchmark.loc[df_trades.index[0]] = 1000  # Buying 1000 shares of JPM
     portvals_benchmark = ms.compute_portvals(df_benchmark, start_val=100000, commission=0, impact=0)
+    # Calculate stats of Benchmark Portfolio
+    cum_ret_bench, avg_daily_ret_bench, std_daily_ret_bench, sharpe_ratio_bench = \
+        ms.compute_portfolio_stats(portvals_benchmark[portvals_benchmark.columns[0]])
 
     # Normalize Portfolio and Benchmark Portfolio
     portvals_norm = portvals / portvals.iloc[0]
@@ -97,8 +102,8 @@ def test_code():
     plt.legend(["Theoretically Optimal Strategy", "Benchmark"])
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")
-    # plt.savefig("OptimalStrategy.png")
-    plt.show()
+    plt.savefig("OptimalStrategy.png")
+    # plt.show()
 
     # Display Portfolio Stats
     start_date = portvals.index[0]
@@ -107,12 +112,16 @@ def test_code():
     print(f"Date Range: {start_date} to {end_date}")
     print()
     print(f"Sharpe Ratio of Fund: {sharpe_ratio}")
+    print(f"Sharpe Ratio of Benchmark: {sharpe_ratio_bench}")
     print()
     print(f"Cumulative Return of Fund: {cum_ret}")
+    print(f"Cumulative Return of Benchmark: {cum_ret_bench}")
     print()
     print(f"Standard Deviation of Fund: {std_daily_ret}")
+    print(f"Standard Deviation of Benchmark: {std_daily_ret_bench}")
     print()
     print(f"Average Daily Return of Fund: {avg_daily_ret}")
+    print(f"Average Daily Return of Benchmark: {avg_daily_ret_bench}")
     print()
     print(f"Final Portfolio Value: {portvals[-1]}")
 
