@@ -39,11 +39,12 @@ def get_stock_prices(symbols, dates):
 
 def execute_trades(df_trades, df_prices, holdings, start_val, commission, impact):
     # Create a portfolio to track total portfolio value and number of shares of each stock
-    portvals = pd.DataFrame(0, index=df_trades.index, columns=["total"])
+    portvals = pd.DataFrame(index=df_trades.index, columns=["total"])
     total_portfolio_val = start_val
 
     # Execute the orders and simulate the portfolio
     for date in df_trades.index:
+        portvals.loc[date, "total"] = 0
         # If orders are made on that particular date, calculate new values for stocks & portfolio
         if date in df_trades.index:
             orders_made = df_trades.loc[[date]]
