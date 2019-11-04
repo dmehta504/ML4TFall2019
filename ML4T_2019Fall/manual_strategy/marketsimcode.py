@@ -37,29 +37,13 @@ def get_stock_prices(symbols, dates):
     return df_prices
 
 
-def compute_portvals(df_trades, start_val=1000000, commission=9.95, impact=0.005):
-    # Get the historical prices for each symbol in df_trades
-    symbols = df_trades.columns.unique().tolist()
-    df_prices = get_stock_prices(symbols, df_trades.index)
-
+def execute_trades(df_trades, df_prices, holdings, start_val, commission, impact):
     # Create a portfolio to track total portfolio value and number of shares of each stock
-    portvals = pd.DataFrame(index=df_trades.index, columns=["total"] + symbols)
-
-    # Initialize portfolio val at start to starting value, as no money has been made
+    portvals = pd.DataFrame(0, index=df_trades.index, columns=["total"])
     total_portfolio_val = start_val
-    date_last = None
 
     # Execute the orders and simulate the portfolio
     for date in df_trades.index:
-
-        if date_last is None:
-            # This is when no trades have been made i.e. first day of trading
-            portvals.loc[date, :] = 0
-        else:
-            # Make a copy of the values of the previous trading day
-            portvals.loc[date, :] = portvals.loc[date_last, :]
-            portvals.loc[date, "total"] = 0
-
         # If orders are made on that particular date, calculate new values for stocks & portfolio
         if date in df_trades.index:
             orders_made = df_trades.loc[[date]]
@@ -71,23 +55,32 @@ def compute_portvals(df_trades, start_val=1000000, commission=9.95, impact=0.005
                     price_of_stock = (1 + impact) * price_of_stock
                     # If shares are bought, subtract cash amount and commission
                     total_portfolio_val = total_portfolio_val - (price_of_stock * number_of_shares) - commission
-                    portvals.loc[date, stock] += number_of_shares  # Update the number of shares held of that stock
                 elif orders_made.iloc[0][stock] < 0:
                     price_of_stock = (1 - impact) * price_of_stock
                     # If shares are sold, add cash amount and subtract commission
                     total_portfolio_val = total_portfolio_val + (price_of_stock * number_of_shares) - commission
-                    portvals.loc[date, stock] -= number_of_shares
 
         # Update portfolio value for current date
-        for symbol in symbols:
+        for symbol in df_prices.columns:
             # Multiply the number of shares * price of stock for that trading day and add it to the portfolio value
-            portvals.loc[date, "total"] += (portvals.loc[date, symbol] * df_prices.loc[date, symbol])
+            portvals.loc[date, "total"] += (holdings.loc[date, symbol] * df_prices.loc[date, symbol])
 
         portvals.loc[date, "total"] += total_portfolio_val
-        date_last = date
 
-    # return the first column containing portfolio values
-    portvals = portvals.loc[:, "total"].to_frame()
+    return portvals
+
+
+def compute_portvals(df_trades, start_val=1000000, commission=9.95, impact=0.005):
+    # Get the historical prices for each symbol in df_trades
+    symbols = df_trades.columns.unique().tolist()
+    df_prices = get_stock_prices(symbols, df_trades.index)
+
+    # Create dataframe to calculate number of shares of each stock
+    holdings = pd.DataFrame(0, index=df_trades.index, columns=df_trades.columns)
+    holdings += df_trades
+    holdings = holdings.cumsum()
+
+    portvals = execute_trades(df_trades, df_prices, holdings, start_val, commission, impact)
     return portvals
 
 
