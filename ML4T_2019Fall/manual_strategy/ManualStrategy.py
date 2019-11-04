@@ -10,6 +10,7 @@ import pandas as pd
 import datetime as dt
 import marketsimcode as ms
 import indicators as ind
+import matplotlib.pyplot as plt
 
 
 def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), sv=100000):
@@ -78,8 +79,9 @@ def author():
 
 
 def test_code():
+    # In Sample - Portfolio
     df_trades = testPolicy()
-    portvals = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0)
+    portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
     if isinstance(portvals, pd.DataFrame):
         portvals = portvals[
             portvals.columns[0]]  # just get the first column
@@ -88,6 +90,55 @@ def test_code():
 
     cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
     print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
+
+    # Benchmark Portfolio
+    df_benchmark = pd.DataFrame(index=df_trades.index, columns=["JPM"])
+    df_benchmark.loc[df_trades.index] = 0
+    df_benchmark.loc[df_trades.index[0]] = 1000  # Buying 1000 shares of JPM
+    portvals_benchmark = ms.compute_portvals(df_benchmark, start_val=100000, commission=9.95, impact=0.005)
+
+    # Normalize Portfolio and Benchmark Portfolio
+    portvals_norm = portvals / portvals.iloc[0]
+    portvals_benchmark = portvals_benchmark / portvals_benchmark.iloc[0]
+
+    # Generate Plot - In Sample
+    figure, axis = plt.subplots()
+    portvals_norm.plot(ax=axis, color='r')
+    portvals_benchmark.plot(ax=axis, color='g')
+    plt.title("Comparison of Manual Strategy Portfolio vs Benchmark")
+    plt.legend(["Manual Strategy", "Benchmark"])
+    plt.xlabel("Date")
+    plt.ylabel("Normalized Portfolio Value")
+    # plt.savefig("ManualStrategy-InSample.png")
+    plt.show()
+
+    # Out Sample - Portfolio
+    symbol = "JPM"
+    sd = dt.datetime(2010, 1, 1)
+    ed = dt.datetime(2011, 12, 31)
+    df_trades_os = testPolicy(symbol, sd, ed)
+    portvals_os = ms.compute_portvals(df_trades_os, start_val=100000, commission=9.95, impact=0.005)
+
+    # Benchmark Portfolio - Out Sample
+    df_benchmark_os = pd.DataFrame(index=df_trades_os.index, columns=["JPM"])
+    df_benchmark_os.loc[df_trades_os.index] = 0
+    df_benchmark_os.loc[df_trades_os.index[0]] = 1000  # Buying 1000 shares of JPM
+    portvals_benchmark_os = ms.compute_portvals(df_benchmark_os, start_val=100000, commission=9.95, impact=0.005)
+
+    # Normalize Portfolio and Benchmark Portfolio
+    portvals_norm_os = portvals_os / portvals_os.iloc[0]
+    portvals_benchmark_os = portvals_benchmark_os / portvals_benchmark_os.iloc[0]
+
+    # Generate Plot - Out Sample
+    figure, axis = plt.subplots()
+    portvals_norm_os.plot(ax=axis, color='r')
+    portvals_benchmark_os.plot(ax=axis, color='g')
+    plt.title("Comparison of Manual Strategy Portfolio vs Benchmark - Out of Sample")
+    plt.legend(["Manual Strategy", "Benchmark"])
+    plt.xlabel("Date")
+    plt.ylabel("Normalized Portfolio Value")
+    # plt.savefig("ManualStrategy-OutSample.png")
+    plt.show()
 
 
 if __name__ == "__main__":
