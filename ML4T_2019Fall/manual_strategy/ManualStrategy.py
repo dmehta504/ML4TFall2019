@@ -44,7 +44,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             continue
 
         if (sma.loc[date] > sma_threshold[1] and bb_ratio.loc[date] > bbratio_threshold[1])\
-                and (momentum.loc[date] > momentum_threshold[1]):
+                or (momentum.loc[date] > momentum_threshold[1]):
             if current_holding == 0:
                 df_trades.loc[date] = -1000
                 current_holding -= 1000
@@ -55,7 +55,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
                 df_trades.loc[date] = 0
 
         elif (sma.loc[date] < sma_threshold[0] and bb_ratio.loc[date] < bbratio_threshold[0])\
-                and (momentum.loc[date] < momentum_threshold[0]):
+                or (momentum.loc[date] < momentum_threshold[0]):
             if current_holding == 0:
                 df_trades.loc[date] = 1000
                 current_holding += 1000
@@ -75,3 +75,20 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
 
 def author():
     return 'dmehta32'
+
+
+def test_code():
+    df_trades = testPolicy()
+    portvals = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0)
+    if isinstance(portvals, pd.DataFrame):
+        portvals = portvals[
+            portvals.columns[0]]  # just get the first column
+    else:
+        "warning, code did not return a DataFrame"
+
+    cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
+    print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
+
+
+if __name__ == "__main__":
+    test_code()
