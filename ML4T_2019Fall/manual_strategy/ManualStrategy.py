@@ -28,9 +28,9 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
     momentum = ind.calculate_momentum(prices_JPM, window=10)
 
     # Set thresholds for the indicators
-    sma_threshold = (0.96, 1.04)  # (Low, High)
-    bbratio_threshold = (1.0, 1.0)
-    momentum_threshold = (-0.05, 0.05)
+    sma_threshold = (0.93, 1.06)  # (Low, High)
+    bbratio_threshold = (-1.0, 1.0)
+    momentum_threshold = (-0.25, 0.25)
 
     # Make the dataframe for trades
     df_trades = pd.DataFrame(index=prices_SPY.index, columns=[symbol])
@@ -44,8 +44,8 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             date_last = date
             continue
 
-        if (sma.loc[date] > sma_threshold[1] and bb_ratio.loc[date] > bbratio_threshold[1])\
-                or (momentum.loc[date] > momentum_threshold[1]):
+        if (sma.loc[date] > sma_threshold[1] and momentum.loc[date] > momentum_threshold[1])\
+                or (bb_ratio.loc[date] > bbratio_threshold[1]):
             if current_holding == 0:
                 df_trades.loc[date] = -1000
                 current_holding -= 1000
@@ -55,8 +55,8 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             elif current_holding == -1000:
                 df_trades.loc[date] = 0
 
-        elif (sma.loc[date] < sma_threshold[0] and bb_ratio.loc[date] < bbratio_threshold[0])\
-                or (momentum.loc[date] < momentum_threshold[0]):
+        elif (sma.loc[date] < sma_threshold[0] and momentum.loc[date] < momentum_threshold[0])\
+                or (bb_ratio.loc[date] < bbratio_threshold[0]):
             if current_holding == 0:
                 df_trades.loc[date] = 1000
                 current_holding += 1000
