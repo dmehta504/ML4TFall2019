@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import datetime as dt
 import marketsimcode as ms
+import matplotlib.pyplot as plt
 
 
 def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), sv=100000):
@@ -84,7 +85,22 @@ def test_code():
     df_benchmark.loc[df_trades.index[0]] = 1000  # Buying 1000 shares of JPM
     portvals_benchmark = ms.compute_portvals(df_benchmark, start_val=100000, commission=0, impact=0)
 
-    # Compare portfolio against benchmark
+    # Normalize Portfolio and Benchmark Portfolio
+    portvals_norm = portvals / portvals.iloc[0]
+    portvals_benchmark = portvals_benchmark / portvals_benchmark.iloc[0]
+
+    # Generate Plot
+    figure, axis = plt.subplots()
+    portvals_norm.plot(ax=axis, color='r')
+    portvals_benchmark.plot(ax=axis, color='g')
+    plt.title("Comparison of Theoretically Optimal Portfolio vs Benchmark")
+    plt.legend(["Theoretically Optimal Strategy", "Benchmark"])
+    plt.xlabel("Date")
+    plt.ylabel("Normalized Portfolio Value")
+    # plt.savefig("OptimalStrategy.png")
+    plt.show()
+
+    # Display Portfolio Stats
     start_date = portvals.index[0]
     end_date = portvals.index[-1]
 
