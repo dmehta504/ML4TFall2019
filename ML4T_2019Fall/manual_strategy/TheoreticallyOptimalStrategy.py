@@ -63,6 +63,10 @@ def compute_daily_returns(prices):
     return daily_returns
 
 
+def author():
+    return 'dmehta32'
+
+
 def test_code():
     df_trades = testPolicy()
     portvals = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0)
