@@ -11,26 +11,6 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 
-def compute_portfolio_stats(portvals):
-    # Calculate cumulative return
-    cumulative_return = (portvals / portvals[0]) - 1
-    cumulative_return = cumulative_return[-1]
-
-    # Calculate daily returns
-    daily_return = portvals.copy()
-    daily_return[1:] = (portvals[1:] / portvals[:-1].values) - 1
-    avg_daily_ret = daily_return[1:].mean()
-
-    # Calculate standard deviation of daily returns
-    std_daily_ret = daily_return[1:].std()
-
-    # Calculate Sharpe Ratio
-    k = np.sqrt(252)
-    sharpe_ratio = k * (avg_daily_ret/std_daily_ret)
-
-    return cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio
-
-
 def get_portfolio(sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12, 31), syms=['JPM']):
     # Code from optimization.py
     # Project 2 - Optimize Something
@@ -79,15 +59,25 @@ def test_code():
     # Create the various plots
     # Plot 1 - SMA
     df[["JPM", "SMA"]].plot(figsize=(10, 8))
-    plt.show()
+    plt.savefig("price_sma.png")
+    # plt.show()
 
     # Plot 2 - Bollinger Bands
-    df[["JPM", "SMA", "Upper Band", "Lower Band", "Bollinger Ratio"]].plot(figsize=(20, 10))
-    plt.show()
+    df[["JPM", "SMA", "Upper Band", "Lower Band"]].plot(figsize=(15, 20))
+    plt.savefig("price_bb.png")
+    # plt.show()
 
-    # Plot 3 - Momentum
+    # Plot 3 - Bollinger Band Ratio
+    df[["Bollinger Ratio"]].plot(figsize=(10, 8))
+    plt.axhline(y=1.0, color='r')
+    plt.axhline(y=-1.0, color='r')
+    plt.savefig("price_bb_ratio.png")
+    # plt.show()
+
+    # Plot 4 - Momentum
     df[["JPM", "Momentum"]].plot(figsize=(10, 8))
-    plt.show()
+    plt.savefig("price_mom.png")
+    # plt.show()
 
 
 def author():
