@@ -18,7 +18,6 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
     prices_all = prices_all / prices_all.iloc[0]  # Normalize the prices
     prices_SPY = prices_all['SPY']
     prices_JPM = prices_all['JPM']
-    daily_returns = compute_daily_returns(prices_JPM)
 
     df_trades = pd.DataFrame(index=prices_SPY.index, columns=[symbol])
     current_holding = 0
@@ -30,7 +29,15 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             date_last = date
             continue
 
-        if daily_returns.loc[date] < 0:
+        # Last day of trading, no more future prices to look at
+        if date == prices_SPY.index[-1]:
+            df_trades.loc[date] = 0
+            break
+
+        present_price = prices_JPM.loc[date_last]
+        future_price = prices_JPM.loc[date]
+
+        if future_price < present_price:
             if current_holding == 0:
                 df_trades.loc[date_last] = -1000
                 current_holding -= 1000
@@ -40,7 +47,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             elif current_holding == -1000:
                 df_trades.loc[date_last] = 0
 
-        elif daily_returns.loc[date] > 0:
+        elif future_price > present_price:
             if current_holding == 0:
                 df_trades.loc[date_last] = 1000
                 current_holding += 1000
@@ -56,11 +63,6 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
         date_last = date
 
     return df_trades
-
-
-def compute_daily_returns(prices):
-    daily_returns = prices / prices.shift(1) - 1
-    return daily_returns
 
 
 def author():
