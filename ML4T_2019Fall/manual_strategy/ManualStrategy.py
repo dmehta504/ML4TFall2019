@@ -144,7 +144,48 @@ def test_code():
     plt.savefig("ManualStrategy-OutSample.png")
     # plt.show()
 
-    
+    # Display Portfolio Stats
+    portvals_os = portvals_os[portvals_os.columns[0]]
+
+    # In - Sample Stats
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
+    # print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
+    cum_ret_bench, avg_daily_ret_bench, std_daily_ret_bench, sharpe_ratio_bench = \
+        ms.compute_portfolio_stats(portvals_benchmark[portvals_benchmark.columns[0]])
+
+    print(f"Sharpe Ratio of Fund (In-Sample): {sharpe_ratio}")
+    print(f"Sharpe Ratio of Benchmark (In-Sample): {sharpe_ratio_bench}")
+    print()
+    print(f"Cumulative Return of Fund (In-Sample): {cum_ret}")
+    print(f"Cumulative Return of Benchmark (In-Sample): {cum_ret_bench}")
+    print()
+    print(f"Standard Deviation of Fund (In-Sample): {std_daily_ret}")
+    print(f"Standard Deviation of Benchmark (In-Sample): {std_daily_ret_bench}")
+    print()
+    print(f"Average Daily Return of Fund (In-Sample): {avg_daily_ret}")
+    print(f"Average Daily Return of Benchmark (In-Sample): {avg_daily_ret_bench}")
+    print()
+    print(f"Final Portfolio Value: {portvals[-1]}")
+    print()
+
+    # Out-Sample Stats
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals_os)
+    cum_ret_bench, avg_daily_ret_bench, std_daily_ret_bench, sharpe_ratio_bench = \
+        ms.compute_portfolio_stats(portvals_benchmark[portvals_benchmark_os.columns[0]])
+
+    print(f"Sharpe Ratio of Fund (Out-Sample): {sharpe_ratio}")
+    print(f"Sharpe Ratio of Benchmark (Out-Sample): {sharpe_ratio_bench}")
+    print()
+    print(f"Cumulative Return of Fund (Out-Sample): {cum_ret}")
+    print(f"Cumulative Return of Benchmark (Out-Sample): {cum_ret_bench}")
+    print()
+    print(f"Standard Deviation of Fund (Out-Sample): {std_daily_ret}")
+    print(f"Standard Deviation of Benchmark (Out-Sample): {std_daily_ret_bench}")
+    print()
+    print(f"Average Daily Return of Fund (Out-Sample): {avg_daily_ret}")
+    print(f"Average Daily Return of Benchmark (Out-Sample): {avg_daily_ret_bench}")
+    print()
+    print(f"Final Portfolio Value: {portvals_os[-1]}")
 
 
 if __name__ == "__main__":
