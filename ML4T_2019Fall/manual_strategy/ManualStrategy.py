@@ -28,9 +28,9 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
     momentum = ind.calculate_momentum(prices_JPM, window=10)
 
     # Set thresholds for the indicators
-    sma_threshold = (0.93, 1.06)  # (Low, High)
+    sma_threshold = (0.93, 1.08)  # (Low, High)
     bbratio_threshold = (-1.0, 1.0)
-    momentum_threshold = (-0.25, 0.25)
+    momentum_threshold = (-0.3, 0.3)
 
     # Make the dataframe for trades
     df_trades = pd.DataFrame(index=prices_SPY.index, columns=[symbol])
@@ -44,6 +44,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             date_last = date
             continue
 
+        # Sell the stock i.e. SHORT
         if (sma.loc[date] > sma_threshold[1] and momentum.loc[date] > momentum_threshold[1])\
                 or (bb_ratio.loc[date] > bbratio_threshold[1]):
             if current_holding == 0:
@@ -55,6 +56,7 @@ def testPolicy(symbol="JPM", sd=dt.datetime(2008, 1, 1), ed=dt.datetime(2009, 12
             elif current_holding == -1000:
                 df_trades.loc[date] = 0
 
+        # Buy the stock i.e. LONG
         elif (sma.loc[date] < sma_threshold[0] and momentum.loc[date] < momentum_threshold[0])\
                 or (bb_ratio.loc[date] < bbratio_threshold[0]):
             if current_holding == 0:
@@ -88,9 +90,6 @@ def test_code():
     else:
         "warning, code did not return a DataFrame"
 
-    cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(portvals)
-    print(cumulative_return, avg_daily_ret, std_daily_ret, sharpe_ratio)
-
     # Benchmark Portfolio
     df_benchmark = pd.DataFrame(index=df_trades.index, columns=["JPM"])
     df_benchmark.loc[df_trades.index] = 0
@@ -109,8 +108,13 @@ def test_code():
     plt.legend(["Manual Strategy", "Benchmark"])
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")
-    # plt.savefig("ManualStrategy-InSample.png")
-    plt.show()
+    for date, trade in df_trades.iterrows():
+        if trade["JPM"] < 0:
+            plt.axvline(x=date, color='k')
+        elif trade["JPM"] > 0:
+            plt.axvline(x=date, color='b')
+    plt.savefig("ManualStrategy-InSample.png")
+    # plt.show()
 
     # Out Sample - Portfolio
     symbol = "JPM"
@@ -137,8 +141,10 @@ def test_code():
     plt.legend(["Manual Strategy", "Benchmark"])
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")
-    # plt.savefig("ManualStrategy-OutSample.png")
-    plt.show()
+    plt.savefig("ManualStrategy-OutSample.png")
+    # plt.show()
+
+    
 
 
 if __name__ == "__main__":
