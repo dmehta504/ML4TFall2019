@@ -87,10 +87,16 @@ class QLearner(object):
         self.q_table[self.s, self.a] = (1 - alpha) * self.q_table[self.s, self.a] + \
                                        alpha * (r + gamma * (self.q_table[s_prime, best_action]))
 
+        # Decide the best action to take based on the action rate
         if rand.random() < self.action_rate:
             action = rand.randint(0, self.num_actions - 1)
         else:
             action = best_action
+
+        # Update action, current state and action rate
+        self.a = action
+        self.s = s_prime
+        self.action_rate = self.action_rate * self.action_decay_rate
 
         if self.verbose: print(f"s = {s_prime}, a = {action}, r={r}")
         return action
