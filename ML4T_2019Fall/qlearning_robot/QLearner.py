@@ -55,6 +55,7 @@ class QLearner(object):
         self.verbose = verbose
 
         self.q_table = np.random.uniform(-1.0, 1.0, size=(self.states, self.num_actions))
+        self.experience_dict = {'s': [], 'a': [], 's_prime': [], 'r': []}
 
     def querysetstate(self, s):
         """  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -87,13 +88,32 @@ class QLearner(object):
         self.q_table[self.s, self.a] = (1 - alpha) * self.q_table[self.s, self.a] + \
                                        alpha * (r + gamma * (self.q_table[s_prime, best_action]))
 
+        # Update experience
+        self.experience_dict['s'].append(self.s)
+        self.experience_dict['a'].append(self.a)
+        self.experience_dict['s_prime'].append(s_prime)
+        self.experience_dict['r'].append(r)
+
+        # Execute Dyna if specified
+        if self.dyna > 0:
+            memory = len(self.experience_dict['s'])
+            random_choices = np.random.randint(memory, size=self.dyna)
+            for i in range(self.dyna):
+                choice = random_choices[i]
+                s = self.experience_dict['s'][choice]
+                a = self.experience_dict['a'][choice]
+                r = self.experience_dict['r'][choice]
+                sprime = self.experience_dict['s_prime'][choice]
+                best_a = np.argmax([self.q_table[sprime]])
+                self.q_table[s, a] = (1 - alpha) * self.q_table[s, a] + alpha * (r + gamma * self.q_table[sprime, best_a])
+
         # Decide the best action to take based on the action rate
         if rand.random() < self.action_rate:
             action = rand.randint(0, self.num_actions - 1)
         else:
             action = best_action
 
-        # Update action, current state and action rate
+        # Update action, current state and decay the action rate
         self.a = action
         self.s = s_prime
         self.action_rate = self.action_rate * self.action_decay_rate
