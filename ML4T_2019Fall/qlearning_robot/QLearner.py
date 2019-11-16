@@ -42,6 +42,7 @@ class QLearner(object):
                  dyna=0,
                  verbose=False):
 
+        # Assign variables
         self.verbose = verbose
         self.num_actions = num_actions
         self.s = 0
@@ -54,6 +55,7 @@ class QLearner(object):
         self.dyna = dyna
         self.verbose = verbose
 
+        # Create Q-Table and an experiene dictionary for Dyna
         self.q_table = np.random.uniform(-1.0, 1.0, size=(self.states, self.num_actions))
         self.experience_dict = {'s': [], 'a': [], 's_prime': [], 'r': []}
 
@@ -96,8 +98,9 @@ class QLearner(object):
 
         # Execute Dyna if specified
         if self.dyna > 0:
-            memory = len(self.experience_dict['s'])
-            random_choices = np.random.randint(memory, size=self.dyna)
+            # Create array index of random choices to get s, s', a and r from experience dictionary
+            random_choices = np.random.randint(len(self.experience_dict['s']), size=self.dyna)
+            # Using experience replay (dict), update Q-table as specified by the Dyna number
             for i in range(self.dyna):
                 choice = random_choices[i]
                 s = self.experience_dict['s'][choice]
