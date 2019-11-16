@@ -55,7 +55,7 @@ class QLearner(object):
         self.dyna = dyna
         self.verbose = verbose
 
-        # Create Q-Table and an experiene dictionary for Dyna
+        # Create Q-Table and an experience dictionary for Dyna
         self.q_table = np.random.uniform(-1.0, 1.0, size=(self.states, self.num_actions))
         self.experience_dict = {'s': [], 'a': [], 's_prime': [], 'r': []}
 
@@ -90,7 +90,7 @@ class QLearner(object):
         self.q_table[self.s, self.a] = (1 - alpha) * self.q_table[self.s, self.a] + \
                                        alpha * (r + gamma * (self.q_table[s_prime, best_action]))
 
-        # Update experience
+        # Update experience dictionary for Dyna
         self.experience_dict['s'].append(self.s)
         self.experience_dict['a'].append(self.a)
         self.experience_dict['s_prime'].append(s_prime)
