@@ -64,7 +64,7 @@ class QLearner(object):
         """
         self.s = s
 
-        if np.random.uniform() < self.action_rate:
+        if rand.random() < self.action_rate:
             action = rand.randint(0, self.num_actions - 1)
         else:
             action = np.argmax(self.q_table[self.s])
@@ -79,7 +79,19 @@ class QLearner(object):
         @param r: The ne state  		   	  			  	 		  		  		    	 		 		   		 		  
         @returns: The selected action  		   	  			  	 		  		  		    	 		 		   		 		  
         """
-        action = rand.randint(0, self.num_actions - 1)
+        # Update Q-Table according to equation
+        # 1 - alpha * Q[s, a] + alpha * (r + gamma * max(Q[s_prime]))
+        alpha = self.alpha
+        gamma = self.gamma
+        best_action = np.argmax[self.q_table[s_prime]]
+        self.q_table[self.s, self.a] = (1 - alpha) * self.q_table[self.s, self.a] + \
+                                       alpha * (r + gamma * (self.q_table[s_prime, best_action]))
+
+        if rand.random() < self.action_rate:
+            action = rand.randint(0, self.num_actions - 1)
+        else:
+            action = best_action
+
         if self.verbose: print(f"s = {s_prime}, a = {action}, r={r}")
         return action
 
