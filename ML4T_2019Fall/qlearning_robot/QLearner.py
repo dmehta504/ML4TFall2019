@@ -56,8 +56,6 @@ class QLearner(object):
 
         self.q_table = np.random.uniform(-1.0, 1.0, size=(self.states, self.num_actions))
 
-
-
     def querysetstate(self, s):
         """  		   	  			  	 		  		  		    	 		 		   		 		  
         @summary: Update the state without updating the Q-table  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -65,7 +63,12 @@ class QLearner(object):
         @returns: The selected action  		   	  			  	 		  		  		    	 		 		   		 		  
         """
         self.s = s
-        action = rand.randint(0, self.num_actions - 1)
+
+        if np.random.uniform() < self.action_rate:
+            action = rand.randint(0, self.num_actions - 1)
+        else:
+            action = np.argmax(self.q_table[self.s])
+
         if self.verbose: print(f"s = {s}, a = {action}")
         return action
 
@@ -80,7 +83,7 @@ class QLearner(object):
         if self.verbose: print(f"s = {s_prime}, a = {action}, r={r}")
         return action
 
-    def author():
+    def author(self):
         return 'dmehta32'
 
 
