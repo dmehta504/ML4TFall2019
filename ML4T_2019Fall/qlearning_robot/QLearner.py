@@ -32,20 +32,31 @@ import random as rand
 
 class QLearner(object):
 
-    def __init__(self, \
-                 num_states=100, \
-                 num_actions=4, \
-                 alpha=0.2, \
-                 gamma=0.9, \
-                 rar=0.5, \
-                 radr=0.99, \
-                 dyna=0, \
+    def __init__(self,
+                 num_states=100,
+                 num_actions=4,
+                 alpha=0.2,
+                 gamma=0.9,
+                 rar=0.5,
+                 radr=0.99,
+                 dyna=0,
                  verbose=False):
 
         self.verbose = verbose
         self.num_actions = num_actions
         self.s = 0
         self.a = 0
+        self.states = num_states
+        self.alpha = alpha
+        self.gamma = gamma
+        self.action_rate = rar
+        self.action_decay_rate = radr
+        self.dyna = dyna
+        self.verbose = verbose
+
+        self.q_table = np.random.uniform(-1.0, 1.0, size=(self.states, self.num_actions))
+
+
 
     def querysetstate(self, s):
         """  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -69,9 +80,8 @@ class QLearner(object):
         if self.verbose: print(f"s = {s_prime}, a = {action}, r={r}")
         return action
 
-
-def author():
-    return 'dmehta32'
+    def author():
+        return 'dmehta32'
 
 
 if __name__ == "__main__":
