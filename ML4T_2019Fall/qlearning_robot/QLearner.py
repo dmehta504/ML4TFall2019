@@ -83,7 +83,7 @@ class QLearner(object):
         # 1 - alpha * Q[s, a] + alpha * (r + gamma * max(Q[s_prime]))
         alpha = self.alpha
         gamma = self.gamma
-        best_action = np.argmax[self.q_table[s_prime]]
+        best_action = np.argmax([self.q_table[s_prime]])
         self.q_table[self.s, self.a] = (1 - alpha) * self.q_table[self.s, self.a] + \
                                        alpha * (r + gamma * (self.q_table[s_prime, best_action]))
 
