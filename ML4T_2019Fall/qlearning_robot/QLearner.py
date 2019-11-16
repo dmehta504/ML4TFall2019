@@ -21,7 +21,7 @@ GT honor code violation.
   		   	  			  	 		  		  		    	 		 		   		 		  
 -----do not edit anything above this line---  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-Student Name: Tucker Balch (replace with your name)  		   	  			  	 		  		  		    	 		 		   		 		  
+Student Name: Dhruv Mehta (replace with your name)
 GT User ID: dmehta32 (replace with your User ID)
 GT ID: 902831571 (replace with your GT ID)
 """
