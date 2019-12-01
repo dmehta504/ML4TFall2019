@@ -51,7 +51,7 @@ class StrategyLearner(object):
                     ed=dt.datetime(2009, 1, 1), \
                     sv=10000):
 
-        # add your code to do learning here  		   	  			  	 		  		  		    	 		 		   		 		  
+        # add your code to do learning here
         # example usage of the old backward compatible util function  		   	  			  	 		  		  		    	 		 		   		 		  
         syms = [symbol]
         dates = pd.date_range(sd, ed)
@@ -60,7 +60,7 @@ class StrategyLearner(object):
         prices_SPY = prices_all['SPY']  # only SPY, for comparison later
         if self.verbose: print(prices)
 
-        # Get Indicators
+        # Get Indicators used from Project 6 - Manual Strategy (indicators.py)
         sma = ind.calculate_sma(prices)
         bb_upper, bb_lower, bb_ratio = ind.calculate_bb(prices)
         window = 10
@@ -103,7 +103,7 @@ class StrategyLearner(object):
         prices = prices_all[syms]  # only portfolio symbols
         # prices_SPY = prices_all['SPY']  # only SPY, for comparison later
 
-        # Get Indicators
+        # Get Indicators used from Project 6 - Manual Strategy (indicators.py)
         sma = ind.calculate_sma(prices)
         bb_upper, bb_lower, bb_ratio = ind.calculate_bb(prices)
         window = 10
@@ -114,49 +114,58 @@ class StrategyLearner(object):
         indicators = indicators[:-5]
         testX = indicators.values
 
-        # Querying the learner for testY
+        # Based on the trained learner, get the predicted Y values
         testY = self.learner.query(testX)
 
-        # Constructing trades DataFrame
-        trades = prices_all[syms].copy()
-        trades.loc[:] = 0
-        flag = 0
+        # Make the dataframe for trades
+        df_trades = pd.DataFrame(index=prices_all.index, columns=[symbol])
+        df_trades.loc[:] = 0
+        current_holding = 0
         for i in range(testY.shape[0]):
-            if flag == 0:
-                if testY[i] > 0:
-                    trades.values[i, :] = 1000
-                    flag = 1
-                elif testY[i] < 0:
-                    trades.values[i, :] = -1000
-                    flag = -1
+            # Buy the stock i.e. LONG
+            if testY[i] > 0:
+                if current_holding == 0:
+                    df_trades.values[i, :] = 1000
+                    current_holding += 1000
+                elif current_holding == -1000:
+                    df_trades.values[i, :] = 2000
+                    current_holding += 2000
+                elif current_holding == 1000:
+                    df_trades.values[i, :] = 0
 
-            elif flag == 1:
-                if testY[i] < 0:
-                    trades.values[i, :] = -2000
-                    flag = -1
-                elif testY[i] == 0:
-                    trades.values[i, :] = -1000
-                    flag = 0
+            # Sell the stock i.e. SHORT
+            elif testY[i] < 0:
+                if current_holding == 0:
+                    df_trades.values[i, :] = -1000
+                    current_holding -= 1000
+                elif current_holding == 1000:
+                    df_trades.values[i, :] = -2000
+                    current_holding -= 2000
+                elif current_holding == -1000:
+                    df_trades.values[i, :] = 0
 
-            else:
-                if testY[i] > 0:
-                    trades.values[i, :] = 2000
-                    flag = 1
-                elif testY[i] == 0:
-                    trades.values[i, :] = 1000
-                    flag = 0
+            # Hold 0 Shares of the Stock
+            elif testY[i] == 0:
+                if current_holding == 1000:
+                    df_trades.values[i, :] = -1000
+                    current_holding -= 1000
+                elif current_holding == -1000:
+                    df_trades.values[i, :] = 1000
+                    current_holding += 1000
+                elif current_holding == 0:
+                    df_trades.values[i, :] = 0
 
-        if flag == -1:
-            trades.values[prices.shape[0] - 1, :] = 1000
-        elif flag == 1:
-            trades.values[prices.shape[0] - 1, :] = -1000
+        if current_holding == -1000:
+            df_trades.values[prices.shape[0] - 1, :] = 1000
+        elif current_holding == 1000:
+            df_trades.values[prices.shape[0] - 1, :] = -1000
 
         if self.verbose: print(
-            type(trades))  # it better be a DataFrame!
-        if self.verbose: print(trades)
+            type(df_trades))  # it better be a DataFrame!
+        if self.verbose: print(df_trades)
         if self.verbose: print(prices_all)
 
-        return trades
+        return df_trades
 
     def author(self):
         return 'dmehta32'
