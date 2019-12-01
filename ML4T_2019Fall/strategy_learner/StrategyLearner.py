@@ -52,7 +52,6 @@ class StrategyLearner(object):
                     sv=10000):
 
         # add your code to do learning here  		   	  			  	 		  		  		    	 		 		   		 		  
-
         # example usage of the old backward compatible util function  		   	  			  	 		  		  		    	 		 		   		 		  
         syms = [symbol]
         dates = pd.date_range(sd, ed)
@@ -66,38 +65,33 @@ class StrategyLearner(object):
         bb_upper, bb_lower, bb_ratio = ind.calculate_bb(prices)
         window = 10
         momentum = ind.calculate_momentum(prices, window)
-        df1 = sma.rename(columns={symbol: 'SMA'})
-        df2 = bb_ratio.rename(columns={symbol: 'BBR'})
-        df3 = momentum.rename(columns={symbol: 'MOM'})
-
-        indicators = pd.concat((df1, df2, df3), axis=1)
+        indicators = pd.concat((sma, bb_ratio, momentum), axis=1)
+        indicators.columns = ['SMA', 'BBR', 'MOM']
         indicators.fillna(0, inplace=True)
         indicators = indicators[:-5]
         trainX = indicators.values
 
-        # Constructing trainY
-        trainY = []
-        for i in range(prices.shape[0] - 5):
-            ratio = (prices.ix[i + 5, symbol] - prices.ix[i, symbol]) / prices.ix[i, symbol]
-            if ratio > (0.02 + self.impact):
-                trainY.append(1)
-            elif ratio < (-0.02 - self.impact):
-                trainY.append(-1)
+        # Create the Training Set for Y Values based on the indicators
+        # We use market variance as 2% and use N = 5 days
+        N = 5
+        YBUY = 0.02 + self.impact
+        YSELL = -0.02 - self.impact
+        prices = prices / prices.iloc[0]
+        trainY = np.zeros(prices.shape[0] - N)  # Normalize Prices
+        for t in range(prices.shape[0] - N):
+            # ret = (price[t+N]/price[t]) - 1.0
+            ret = (prices.ix[t + N, symbol] / prices.ix[t, symbol]) - 1.0
+            if ret > YBUY:
+                trainY[t] = 1  # LONG
+            elif ret < YSELL:
+                trainY[t] = -1  # SHORT
             else:
-                trainY.append(0)
-        trainY = np.array(trainY)
+                trainY[t] = 0  # CASH
 
-        # Training
+        # Feed our bag learner the training data to learn a strategy
         self.learner.addEvidence(trainX, trainY)
 
-        # example use with new colname  		   	  			  	 		  		  		    	 		 		   		 		  
-        # volume_all = ut.get_data(syms, dates, colname="Volume")  # automatically adds SPY
-        # volume = volume_all[syms]  # only portfolio symbols
-        # volume_SPY = volume_all['SPY']  # only SPY, for comparison later
-        # if self.verbose: print(volume)
-
-        # this method should use the existing policy and test it against new data
-
+    # this method should use the existing policy and test it against new data
     def testPolicy(self, symbol="IBM", \
                    sd=dt.datetime(2009, 1, 1), \
                    ed=dt.datetime(2010, 1, 1), \
@@ -114,11 +108,8 @@ class StrategyLearner(object):
         bb_upper, bb_lower, bb_ratio = ind.calculate_bb(prices)
         window = 10
         momentum = ind.calculate_momentum(prices, window)
-        df1 = sma.rename(columns={symbol: 'SMA'})
-        df2 = bb_ratio.rename(columns={symbol: 'BBR'})
-        df3 = momentum.rename(columns={symbol: 'MOM'})
-
-        indicators = pd.concat((df1, df2, df3), axis=1)
+        indicators = pd.concat((sma, bb_ratio, momentum), axis=1)
+        indicators.columns = ['SMA', 'BBR', 'MOM']
         indicators.fillna(0, inplace=True)
         indicators = indicators[:-5]
         testX = indicators.values
