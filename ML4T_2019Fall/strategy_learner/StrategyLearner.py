@@ -90,14 +90,11 @@ class StrategyLearner(object):
         # Training
         self.learner.addEvidence(trainX, trainY)
 
-
-
         # example use with new colname  		   	  			  	 		  		  		    	 		 		   		 		  
-        #volume_all = ut.get_data(syms, dates,
-                                 colname="Volume")  # automatically adds SPY
-        #volume = volume_all[syms]  # only portfolio symbols
-        #volume_SPY = volume_all['SPY']  # only SPY, for comparison later
-        #if self.verbose: print(volume)
+        # volume_all = ut.get_data(syms, dates, colname="Volume")  # automatically adds SPY
+        # volume = volume_all[syms]  # only portfolio symbols
+        # volume_SPY = volume_all['SPY']  # only SPY, for comparison later
+        # if self.verbose: print(volume)
 
         # this method should use the existing policy and test it against new data
 
@@ -106,11 +103,68 @@ class StrategyLearner(object):
                    ed=dt.datetime(2010, 1, 1), \
                    sv=10000):
 
+        syms = [symbol]
+        dates = pd.date_range(sd, ed)
+        prices_all = ut.get_data(syms, dates)  # automatically adds SPY
+        prices = prices_all[syms]  # only portfolio symbols
+        # prices_SPY = prices_all['SPY']  # only SPY, for comparison later
+
+        # Get Indicators
+        sma = ind.calculate_sma(prices)
+        bb_upper, bb_lower, bb_ratio = ind.calculate_bb(prices)
+        window = 10
+        momentum = ind.calculate_momentum(prices, window)
+        df1 = sma.rename(columns={symbol: 'SMA'})
+        df2 = bb_ratio.rename(columns={symbol: 'BBR'})
+        df3 = momentum.rename(columns={symbol: 'MOM'})
+
+        indicators = pd.concat((df1, df2, df3), axis=1)
+        indicators.fillna(0, inplace=True)
+        indicators = indicators[:-5]
+        testX = indicators.values
+
+        # Querying the learner for testY
+        testY = self.learner.query(testX)
+
+        # Constructing trades DataFrame
+        trades = prices_all[syms].copy()
+        trades.loc[:] = 0
+        flag = 0
+        for i in range(testY.shape[0]):
+            if flag == 0:
+                if testY[i] > 0:
+                    trades.values[i, :] = 1000
+                    flag = 1
+                elif testY[i] < 0:
+                    trades.values[i, :] = -1000
+                    flag = -1
+
+            elif flag == 1:
+                if testY[i] < 0:
+                    trades.values[i, :] = -2000
+                    flag = -1
+                elif testY[i] == 0:
+                    trades.values[i, :] = -1000
+                    flag = 0
+
+            else:
+                if testY[i] > 0:
+                    trades.values[i, :] = 2000
+                    flag = 1
+                elif testY[i] == 0:
+                    trades.values[i, :] = 1000
+                    flag = 0
+
+        if flag == -1:
+            trades.values[prices.shape[0] - 1, :] = 1000
+        elif flag == 1:
+            trades.values[prices.shape[0] - 1, :] = -1000
 
         if self.verbose: print(
             type(trades))  # it better be a DataFrame!
         if self.verbose: print(trades)
         if self.verbose: print(prices_all)
+
         return trades
 
     def author(self):
