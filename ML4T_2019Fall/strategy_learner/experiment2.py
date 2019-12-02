@@ -35,11 +35,23 @@ def test_code():
     prices = prices_all[syms]  # only portfolio symbols
     prices_SPY = prices_all['SPY']  # only SPY, for comparison later
 
+    # Strategy Learner (Impact = 0)
+    strat_learner = sl.StrategyLearner(verbose=False, impact=0)
+    strat_learner.addEvidence(symbol, sd, ed, sv=100000)
+    df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
+    strat_portvals_zero = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0)
+
     # Strategy Learner (Impact = 0.005)
     strat_learner = sl.StrategyLearner(verbose=False, impact=0.005)
     strat_learner.addEvidence(symbol, sd, ed, sv=100000)
     df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
-    strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
+    strat_portvals_imp1 = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0.005)
+
+    # Strategy Learner (Impact = 0.1)
+    strat_learner = sl.StrategyLearner(verbose=False, impact=0.1)
+    strat_learner.addEvidence(symbol, sd, ed, sv=100000)
+    df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
+    strat_portvals_imp2 = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0.1)
 
 
 if __name__ == "__main__":
