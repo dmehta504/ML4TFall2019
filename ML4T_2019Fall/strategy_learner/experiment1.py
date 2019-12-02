@@ -51,69 +51,50 @@ def test_code():
     df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
     strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
 
-    # Printing Portfolio statistics
-    daily_returns = (ms_port_val / ms_port_val.shift(1)) - 1
-    daily_returns = daily_returns[1:]
-    cr = (ms_port_val.iloc[-1] / ms_port_val.iloc[0]) - 1
-    adr = daily_returns.mean()
-    sddr = daily_returns.std()
-    a = np.sqrt(252.0)
-    sr = (a * (adr)) / sddr
+    # Normalize Portfolios
+    # ms_portvals = ms_portvals / ms_portvals.iloc[0]
+    # strat_portvals = strat_portvals / strat_portvals.iloc[0]
+    # portvals_benchmark = portvals_benchmark / portvals_benchmark.iloc[0]
 
-    '''
-    print "Manual Strategy Stats"
-    print "CR " + str(cr)
-    print "Avg of daily returns " + str(adr)
-    print "Std deviation of daily returns " + str(sddr)
-    print "Sharpe Ratio " + str(sr)
-    '''
+    # In - Sample Stats
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(ms_portvals[ms_portvals.columns[0]])
+    cum_ret_bench, avg_daily_ret_bench, std_daily_ret_bench, sharpe_ratio_bench = \
+        ms.compute_portfolio_stats(portvals_benchmark[portvals_benchmark.columns[0]])
+    cum_ret_strat, avg_daily_ret_strat, std_daily_ret_strat, sharpe_ratio_strat = \
+        ms.compute_portfolio_stats(strat_portvals[strat_portvals.columns[0]])
 
-    # Printing Benchmark statistics
-    bench_dr = (bench_port_val / bench_port_val.shift(1)) - 1
-    bench_dr = bench_dr[1:]
-    cr = (bench_port_val.iloc[-1] / bench_port_val.iloc[0]) - 1
-    adr = bench_dr.mean()
-    sddr = bench_dr.std()
-    a = np.sqrt(252.0)
-    sr = (a * (adr)) / sddr
-
-    '''
-    print "\nBenchmark Stats"
-    print "CR " + str(cr)
-    print "Avg of daily returns " + str(adr)
-    print "Std deviation of daily returns " + str(sddr)
-    print "Sharpe Ratio " + str(sr)
-    '''
-
-    # Printing StrategyLearner statistics
-    st_dr = (st_port_val / st_port_val.shift(1)) - 1
-    st_dr = st_dr[1:]
-    cr = (st_port_val.iloc[-1] / st_port_val.iloc[0]) - 1
-    adr = st_dr.mean()
-    sddr = st_dr.std()
-    a = np.sqrt(252.0)
-    sr = (a * (adr)) / sddr
-
-    '''
-    print "\nStrategy Learner Stats"
-    print "CR " + str(cr)
-    print "Avg of daily returns " + str(adr)
-    print "Std deviation of daily returns " + str(sddr)
-    print "Sharpe Ratio " + str(sr)
-    '''
+    print(f"Sharpe Ratio of Strategy Learner (In-Sample): {sharpe_ratio_strat}")
+    print(f"Sharpe Ratio of Manual Strategy (In-Sample): {sharpe_ratio}")
+    print(f"Sharpe Ratio of Benchmark (In-Sample): {sharpe_ratio_bench}")
+    print()
+    print(f"Cumulative Return of Strategy Learner (In-Sample): {cum_ret_strat}")
+    print(f"Cumulative Return of Manual Strategy (In-Sample): {cum_ret}")
+    print(f"Cumulative Return of Benchmark (In-Sample): {cum_ret_bench}")
+    print()
+    print(f"Standard Deviation of Strategy Learner (In-Sample): {std_daily_ret_strat}")
+    print(f"Standard Deviation of Manual Strategy (In-Sample): {std_daily_ret}")
+    print(f"Standard Deviation of Benchmark (In-Sample): {std_daily_ret_bench}")
+    print()
+    print(f"Average Daily Return of Strategy Learner (In-Sample): {avg_daily_ret_strat}")
+    print(f"Average Daily Return of Manual Strategy (In-Sample): {avg_daily_ret}")
+    print(f"Average Daily Return of Benchmark (In-Sample): {avg_daily_ret_bench}")
+    print()
+    # print(f"Final Portfolio Value of Strategy Learner: {strat_portvals[-1]}")
+    # print(f"Final Portfolio Value of Manual Strategy: {ms_portvals[-1]}")
+    # print()
 
     # Plotting charts
-    ms_port_val = ms_port_val / ms_port_val[0]
-    bench_port_val = bench_port_val / bench_port_val[0]
-    st_port_val = st_port_val / st_port_val[0]
-    ax = ms_port_val.plot(fontsize=12, color="black", label="Manual Strategy")
-    bench_port_val.plot(ax=ax, color="blue", label='Benchmark')
-    st_port_val.plot(ax=ax, color="green", label='Strategy Learner')
-    plt.title("Experiment 1")
-    ax.set_xlabel("Date")
-    ax.set_ylabel("Portfolio Value")
-    plt.legend()
-    plt.show()
+    # ms_port_val = ms_port_val / ms_port_val[0]
+    # bench_port_val = bench_port_val / bench_port_val[0]
+    # st_port_val = st_port_val / st_port_val[0]
+    # ax = ms_port_val.plot(fontsize=12, color="black", label="Manual Strategy")
+    # bench_port_val.plot(ax=ax, color="blue", label='Benchmark')
+    # st_port_val.plot(ax=ax, color="green", label='Strategy Learner')
+    # plt.title("Experiment 1")
+    # ax.set_xlabel("Date")
+    # ax.set_ylabel("Portfolio Value")
+    # plt.legend()
+    # plt.show()
 
 
 if __name__ == "__main__":
