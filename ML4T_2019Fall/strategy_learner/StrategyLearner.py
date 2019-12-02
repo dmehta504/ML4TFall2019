@@ -144,7 +144,7 @@ class StrategyLearner(object):
                 elif current_holding == -1000:
                     df_trades.values[i, :] = 0
 
-            # Hold 0 Shares of the Stock
+            # HOLD the Stock
             elif testY[i] == 0:
                 if current_holding == 1000:
                     df_trades.values[i, :] = -1000

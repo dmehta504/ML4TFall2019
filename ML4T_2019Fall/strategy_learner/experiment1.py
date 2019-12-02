@@ -70,8 +70,8 @@ def test_code():
     #         plt.axvline(x=date, color='k')
     #     elif trade["JPM"] > 0:
     #         plt.axvline(x=date, color='b')
-    # plt.savefig("ManualStrategy-InSample.png")
-    plt.show()
+    plt.savefig("experiment1.png")
+    # plt.show()
 
     # In - Sample Stats
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(ms_portvals[ms_portvals.columns[0]])

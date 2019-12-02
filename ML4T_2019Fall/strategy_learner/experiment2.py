@@ -63,8 +63,8 @@ def test_code():
     plt.legend(["Impact = 0", "Impact = 0.05", "Impact = 0.01"])
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")
-    # plt.savefig("ManualStrategy-InSample.png")
-    plt.show()
+    plt.savefig("experiment2.png")
+    # plt.show()
 
     # Statistics
     cum_ret_zero, avg_daily_ret_zero, std_daily_ret_zero, sharpe_ratio_zero = ms.compute_portfolio_stats(
@@ -82,14 +82,14 @@ def test_code():
     print(f"Cumulative Return of Manual Strategy (Impact = 0.005): {cum_ret_imp1}")
     print(f"Cumulative Return of Benchmark (Impact = 0.01): {cum_ret_imp2}")
     print()
-    print(f"Standard Deviation of Strategy Learner (Impact = 0): {std_daily_ret_zero}")
-    print(f"Standard Deviation of Manual Strategy (Impact = 0.005): {std_daily_ret_imp1}")
-    print(f"Standard Deviation of Benchmark (Impact = 0.01): {std_daily_ret_imp2}")
-    print()
-    print(f"Average Daily Return of Strategy Learner (Impact = 0): {avg_daily_ret_zero}")
-    print(f"Average Daily Return of Manual Strategy (Impact = 0.005): {avg_daily_ret_imp1}")
-    print(f"Average Daily Return of Benchmark (Impact = 0.01): {avg_daily_ret_imp2}")
-    print()
+    # print(f"Standard Deviation of Strategy Learner (Impact = 0): {std_daily_ret_zero}")
+    # print(f"Standard Deviation of Manual Strategy (Impact = 0.005): {std_daily_ret_imp1}")
+    # print(f"Standard Deviation of Benchmark (Impact = 0.01): {std_daily_ret_imp2}")
+    # print()
+    # print(f"Average Daily Return of Strategy Learner (Impact = 0): {avg_daily_ret_zero}")
+    # print(f"Average Daily Return of Manual Strategy (Impact = 0.005): {avg_daily_ret_imp1}")
+    # print(f"Average Daily Return of Benchmark (Impact = 0.01): {avg_daily_ret_imp2}")
+    # print()
 
 
 if __name__ == "__main__":
