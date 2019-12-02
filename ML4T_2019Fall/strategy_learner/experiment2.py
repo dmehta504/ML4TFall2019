@@ -9,10 +9,6 @@ import datetime as dt
 import pandas as pd
 import util as ut
 import StrategyLearner as sl
-import BagLearner as bl
-import RTLearner as rt
-import ManualStrategy as mans
-import indicators as ind
 import marketsimcode as ms
 import matplotlib.pyplot as plt
 
@@ -52,6 +48,36 @@ def test_code():
     strat_learner.addEvidence(symbol, sd, ed, sv=100000)
     df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
     strat_portvals_imp2 = ms.compute_portvals(df_trades, start_val=100000, commission=0, impact=0.1)
+
+    # Normalize Portfolios
+    strat_portvals_zero_norm = strat_portvals_zero / strat_portvals_zero.iloc[0]
+    strat_portvals_imp1_norm = strat_portvals_imp1 / strat_portvals_imp1.iloc[0]
+    strat_portvals_imp2_norm = strat_portvals_imp2 / strat_portvals_imp2.iloc[0]
+
+    # Statistics
+    cum_ret_zero, avg_daily_ret_zero, std_daily_ret_zero, sharpe_ratio_zero = ms.compute_portfolio_stats(
+        strat_portvals_zero[strat_portvals_zero.columns[0]])
+    cum_ret_imp1, avg_daily_ret_imp1, std_daily_ret_imp1, sharpe_ratio_imp1 = \
+        ms.compute_portfolio_stats(strat_portvals_imp1[strat_portvals_imp1.columns[0]])
+    cum_ret_imp2, avg_daily_ret_imp2, std_daily_ret_imp2, sharpe_ratio_imp2 = \
+        ms.compute_portfolio_stats(strat_portvals_imp2[strat_portvals_imp2.columns[0]])
+
+    print(f"Sharpe Ratio of Strategy Learner (Impact = 0): {sharpe_ratio_zero}")
+    print(f"Sharpe Ratio of Manual Strategy (Impact = 0.005): {sharpe_ratio_imp1}")
+    print(f"Sharpe Ratio of Benchmark (Impact = 0.1): {sharpe_ratio_imp2}")
+    print()
+    print(f"Cumulative Return of Strategy Learner (Impact = 0): {cum_ret_zero}")
+    print(f"Cumulative Return of Manual Strategy (Impact = 0.005): {cum_ret_imp1}")
+    print(f"Cumulative Return of Benchmark (Impact = 0.1): {cum_ret_imp2}")
+    print()
+    print(f"Standard Deviation of Strategy Learner (Impact = 0): {std_daily_ret_zero}")
+    print(f"Standard Deviation of Manual Strategy (Impact = 0.005): {std_daily_ret_imp1}")
+    print(f"Standard Deviation of Benchmark (Impact = 0.1): {std_daily_ret_imp2}")
+    print()
+    print(f"Average Daily Return of Strategy Learner (Impact = 0): {avg_daily_ret_zero}")
+    print(f"Average Daily Return of Manual Strategy (Impact = 0.005): {avg_daily_ret_imp1}")
+    print(f"Average Daily Return of Benchmark (Impact = 0.1): {avg_daily_ret_imp2}")
+    print()
 
 
 if __name__ == "__main__":
