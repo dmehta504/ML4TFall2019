@@ -52,9 +52,26 @@ def test_code():
     strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
 
     # Normalize Portfolios
-    # ms_portvals = ms_portvals / ms_portvals.iloc[0]
-    # strat_portvals = strat_portvals / strat_portvals.iloc[0]
-    # portvals_benchmark = portvals_benchmark / portvals_benchmark.iloc[0]
+    ms_portvals_norm = ms_portvals / ms_portvals.iloc[0]
+    strat_portvals_norm = strat_portvals / strat_portvals.iloc[0]
+    portvals_benchmark_norm = portvals_benchmark / portvals_benchmark.iloc[0]
+
+    # Generate Plot - In Sample
+    figure, axis = plt.subplots()
+    ms_portvals_norm.plot(ax=axis, color='r')
+    portvals_benchmark_norm.plot(ax=axis, color='g')
+    strat_portvals_norm.plot(ax=axis, color='b')
+    plt.title("Portfolio Comparisons of Strategies")
+    plt.legend(["Manual Strategy", "Benchmark", "Strategy Learner"])
+    plt.xlabel("Date")
+    plt.ylabel("Normalized Portfolio Value")
+    # for date, trade in df_trades.iterrows():
+    #     if trade["JPM"] < 0:
+    #         plt.axvline(x=date, color='k')
+    #     elif trade["JPM"] > 0:
+    #         plt.axvline(x=date, color='b')
+    # plt.savefig("ManualStrategy-InSample.png")
+    plt.show()
 
     # In - Sample Stats
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_portfolio_stats(ms_portvals[ms_portvals.columns[0]])
@@ -82,19 +99,6 @@ def test_code():
     # print(f"Final Portfolio Value of Strategy Learner: {strat_portvals[-1]}")
     # print(f"Final Portfolio Value of Manual Strategy: {ms_portvals[-1]}")
     # print()
-
-    # Plotting charts
-    # ms_port_val = ms_port_val / ms_port_val[0]
-    # bench_port_val = bench_port_val / bench_port_val[0]
-    # st_port_val = st_port_val / st_port_val[0]
-    # ax = ms_port_val.plot(fontsize=12, color="black", label="Manual Strategy")
-    # bench_port_val.plot(ax=ax, color="blue", label='Benchmark')
-    # st_port_val.plot(ax=ax, color="green", label='Strategy Learner')
-    # plt.title("Experiment 1")
-    # ax.set_xlabel("Date")
-    # ax.set_ylabel("Portfolio Value")
-    # plt.legend()
-    # plt.show()
 
 
 if __name__ == "__main__":
