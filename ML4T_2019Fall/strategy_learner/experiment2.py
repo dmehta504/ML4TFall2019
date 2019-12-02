@@ -54,6 +54,18 @@ def test_code():
     strat_portvals_imp1_norm = strat_portvals_imp1 / strat_portvals_imp1.iloc[0]
     strat_portvals_imp2_norm = strat_portvals_imp2 / strat_portvals_imp2.iloc[0]
 
+    # Generate Plots
+    figure, axis = plt.subplots()
+    strat_portvals_zero.plot(ax=axis, color='r')
+    strat_portvals_imp1_norm.plot(ax=axis, color='g')
+    strat_portvals_imp2_norm.plot(ax=axis, color='b')
+    plt.title("Portfolio Comparisons of Strategy Learner")
+    plt.legend(["Impact = 0", "Impact = 0.05", "Impact = 0.1"])
+    plt.xlabel("Date")
+    plt.ylabel("Normalized Portfolio Value")
+    # plt.savefig("ManualStrategy-InSample.png")
+    plt.show()
+
     # Statistics
     cum_ret_zero, avg_daily_ret_zero, std_daily_ret_zero, sharpe_ratio_zero = ms.compute_portfolio_stats(
         strat_portvals_zero[strat_portvals_zero.columns[0]])
