@@ -22,7 +22,24 @@ def author():
 
 
 def test_code():
-    pass
+    # Set Seed to have consistency across runs
+    np.random.seed(902831571)
+
+    # In - Sample Dates
+    sd = dt.datetime(2008, 1, 1)
+    ed = dt.datetime(2009, 12, 31)
+    symbol = 'JPM'
+    syms = [symbol]
+    dates = pd.date_range(sd, ed)
+    prices_all = ut.get_data(syms, dates)  # automatically adds SPY
+    prices = prices_all[syms]  # only portfolio symbols
+    prices_SPY = prices_all['SPY']  # only SPY, for comparison later
+
+    # Strategy Learner (Impact = 0.005)
+    strat_learner = sl.StrategyLearner(verbose=False, impact=0.005)
+    strat_learner.addEvidence(symbol, sd, ed, sv=100000)
+    df_trades = strat_learner.testPolicy(symbol, sd, ed, sv=100000)
+    strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
 
 
 if __name__ == "__main__":
